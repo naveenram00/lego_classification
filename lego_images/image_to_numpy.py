@@ -5,16 +5,16 @@ import numpy as np
 
 #Directory containing images you wish to convert
 input_dir = "/usr/src/lego_classification/lego_images/60"
-print("input" + input_dir)
+
 directories = os.listdir(input_dir)
-print("dirs" + directories)
+
 
 index = 0
 index2 = 0
 
 for folder in directories:
 	#Ignoring .DS_Store dir
-	if folder == '.DS_Store':
+	if folder == '.ds_store':
 		pass
 
 	else:
@@ -24,7 +24,7 @@ for folder in directories:
 		index += 1
 
 		for image in folder2:
-			if image == ".DS_Store":
+			if image == ".ds_store":
 				pass
 
 			else:
@@ -61,5 +61,6 @@ for folder in directories:
 
 print index
 
-np.save('X_train.npy', out) #Saving train image arrays
-np.save('Y_train.npy', index_array) #Saving train labels
+#np.save('X_train.npy', out) #Saving train image arrays
+#np.save('Y_train.npy', index_array) #Saving train labels
+print(index_array)
