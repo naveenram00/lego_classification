@@ -6,4 +6,4 @@ Objective: to test the concept of a 3D search engine, a machine learning program
 
 To test this concept we wil train our networks on images of 10 different LEGO parts, and hopefully classify larger assemblies made from those 10 parts.
 
-test
+
