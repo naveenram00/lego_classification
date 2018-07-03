@@ -61,6 +61,6 @@ for folder in directories:
 
 print index
 
-#np.save('X_train.npy', out) #Saving train image arrays
-#np.save('Y_train.npy', index_array) #Saving train labels
-print(index_array)
+np.save(os.path.join('processed_data', 'X_train.npy'), out)
+np.save(os.path.join('processed_data', 'Y_train.npy'), index_array) #Saving train labels
+#print(index_array)
