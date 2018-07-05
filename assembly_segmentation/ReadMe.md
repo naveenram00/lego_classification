@@ -1,0 +1,1 @@
+This is the first part of the project of using PolyRNN, (https://github.com/davidjesusacu/polyrnn-pp), to capture a picture/video of a broken part and crop it and send it to be classified in our large neural network.
