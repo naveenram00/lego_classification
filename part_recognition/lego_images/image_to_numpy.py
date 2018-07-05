@@ -4,7 +4,7 @@ from PIL import Image
 import numpy as np
 
 #Directory containing images you wish to convert
-input_dir = "/usr/src/lego_classification/lego_images/60"
+input_dir = "/usr/src/lego_classification/part_recognition/lego_images/Test"
 
 directories = os.listdir(input_dir)
 
@@ -31,7 +31,24 @@ for folder in directories:
 				index2 += 1
 
 				im = Image.open(input_dir+"/"+folder+"/"+image) #Opening image
-				#im = im.resize((32, 32), Image.ANTIALIAS)
+				im = im.resize((32, 32), Image.ANTIALIAS)
+				
+				if im.mode != 'RGB':
+					print("Mode:" + im.mode)
+					#im = im.convert('RBG')
+					#im.save(image.toString() + ".jpg")
+					
+					im.load() # required for png.split()
+
+					background = Image.new("RGB", im.size, (255, 255, 255))
+					background.paste(im, mask=im.split()[3]) # 3 is the alpha channel
+
+					background.save(image + '.jpg', 'JPEG', quality=80)
+					im = background
+
+					print("test")
+
+				print(im.size)
 				im = (np.array(im)) #Converting to numpy array
 
 
@@ -57,10 +74,11 @@ for folder in directories:
 				except Exception as e:
 					print e
 					print "Removing image" + image
-					os.remove(input_dir+"/"+folder+"/"+image)
+					#os.remove(input_dir+"/"+folder+"/"+image)
 
 print index
 
 np.save(os.path.join('processed_data', 'X_train.npy'), out)
 np.save(os.path.join('processed_data', 'Y_train.npy'), index_array) #Saving train labels
+print out
 #print(index_array)
