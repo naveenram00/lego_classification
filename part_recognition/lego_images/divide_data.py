@@ -5,6 +5,7 @@ input_dir = "/usr/src/lego_classification/part_recognition/lego_images/6k"
 dest_dir =  "/usr/src/lego_classification/part_recognition/lego_images/train"
 
 def listdir_nohidden(path):
+	#Returns a list without hidden files
 	files = os.listdir(path)
 	for f in files:
 		if f.startswith('.'):
@@ -13,6 +14,7 @@ def listdir_nohidden(path):
 
 
 directories = listdir_nohidden(input_dir)
+files_moved = 0
 for folder in directories:
 	#Ignoring .DS_Store dir
 	if folder.lower() == '.ds_store':
@@ -20,6 +22,7 @@ for folder in directories:
 
 	else:
 		print folder
+		print "files moved: " + files_moved
 
 		files = listdir_nohidden(input_dir + '/' + folder)
 		files = files[0:1000]
@@ -29,10 +32,12 @@ for folder in directories:
 				pass
 
 			else:
+
 				source = input_dir + "/" + folder + "/" + image
 				destination = dest_dir + "/" + folder + "/" + image
 
 				print "folder: " + folder + " image: " + image
 				#print source
 				#print destination
+				files_moved += 1
 				os.rename(source, destination)
