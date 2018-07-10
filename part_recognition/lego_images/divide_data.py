@@ -1,8 +1,8 @@
 
 import os
 
-input_dir = "/usr/src/lego_classification/part_recognition/lego_images/6k"
-dest_dir =  "/usr/src/lego_classification/part_recognition/lego_images/train"
+input_dir = "/usr/src/lego_classification/part_recognition/lego_images/train"
+dest_dir =  "/usr/src/lego_classification/part_recognition/lego_images/test"
 
 def listdir_nohidden(path):
 	#Returns a list without hidden files
@@ -22,7 +22,7 @@ for folder in directories:
 
 	else:
 		print folder
-		print "files moved: " + files_moved
+		print "files moved: " + str(files_moved)
 
 		files = listdir_nohidden(input_dir + '/' + folder)
 		files = files[0:1000]
