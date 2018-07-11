@@ -36,7 +36,7 @@ for folder in directories:
 				source = input_dir + "/" + folder + "/" + image
 				destination = dest_dir + "/" + folder + "/" + image
 
-				print "folder: " + folder + " image: " + image
+				#print "folder: " + folder + " image: " + image
 				#print source
 				#print destination
 				files_moved += 1
