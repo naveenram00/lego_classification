@@ -4,7 +4,7 @@ from PIL import Image
 import numpy as np
 
 #Directory containing images you wish to convert
-input_dir = "/usr/src/lego_classification/part_recognition/lego_images/60"
+input_dir = "/usr/src/lego_classification/part_recognition/lego_images/train"
 
 directories = os.listdir(input_dir)
 directories = sorted(directories)
@@ -33,8 +33,9 @@ for folder in directories:
 				im = Image.open(input_dir+"/"+folder+"/"+image) #Opening image
 				im = im.resize((32, 32), Image.ANTIALIAS)
 				
-				if im.mode != 'RGB':
+				if im.mode == 'RGBA':
 					print("Mode:" + im.mode)
+					print image
 					#im = im.convert('RBG')
 					#im.save(image.toString() + ".jpg")
 					
@@ -46,7 +47,11 @@ for folder in directories:
 					background.save(image + '.jpg', 'JPEG', quality=80)
 					im = background
 
-					#print("test")
+				if im.mode == 'L':
+
+					rgbim = Image.new("RGB", im.size)
+					rgbim.paste(im)
+					im = rgbim
 
 				#print(im.size)
 				im = (np.array(im)) #Converting to numpy array
@@ -65,10 +70,10 @@ for folder in directories:
 						out = np.array([[r] + [g] + [b]], np.uint8) #Creating array with shape (3, 100, 100)
 
 					if index == 1 and index2 == 1:
-						index_array = np.array([[index]])
+						index_array = np.array([[index-1]])
 
 					else:
-						new_index_array = np.array([[index]], np.int8)
+						new_index_array = np.array([[index-1]], np.int8)
 						index_array = np.append(index_array, new_index_array, 0)
 
 				except Exception as e:
@@ -81,10 +86,12 @@ for folder in directories:
 np.save(os.path.join('processed_data', 'X_train.npy'), out)
 np.save(os.path.join('processed_data', 'Y_train.npy'), index_array) #Saving train labels
 
+print index_array
+print "--------------------"
 print len(out)
 print len(index_array)
 #print out
-print index_array
+
 #str1 = ''.join(str(e) for e in out)
 #print str1
 #print(index_array)
