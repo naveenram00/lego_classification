@@ -28,7 +28,7 @@ def cnn_model_fn(features, labels, mode):
   # Input Layer
   # Reshape X to 4-D tensor: [batch_size, width, height, channels]
   # lego images are 28x28 pixels, and have one color channel
-  input_layer = tf.reshape(features["x"], [-1, 28, 28, 1])
+  input_layer = tf.reshape(features["x"], [-1, 32, 32, 3])
 
   # Convolutional Layer #1
   # Computes 32 features using a 5x5 filter with ReLU activation.
@@ -65,12 +65,12 @@ def cnn_model_fn(features, labels, mode):
   # Input Tensor Shape: [batch_size, 14, 14, 64]
   # Output Tensor Shape: [batch_size, 7, 7, 64]
   pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
-
+  print("test")
   # Flatten tensor into a batch of vectors
   # Input Tensor Shape: [batch_size, 7, 7, 64]
   # Output Tensor Shape: [batch_size, 7 * 7 * 64]
-  pool2_flat = tf.reshape(pool2, [-1, 7 * 7 * 64])
-
+  pool2_flat = tf.reshape(pool2, [-1, 8 * 8 * 64])
+  print("hmm?")
   # Dense Layer
   # Densely connected layer with 1024 neurons
   # Input Tensor Shape: [batch_size, 7 * 7 * 64]
@@ -117,11 +117,14 @@ def cnn_model_fn(features, labels, mode):
 
 def main(unused_argv):
   # Load training and eval data
-  lego = tf.contrib.learn.datasets.load_dataset("lego")
-  train_data = lego.train.images  # Returns np.array
-  train_labels = np.asarray(lego.train.labels, dtype=np.int32)
-  eval_data = lego.test.images  # Returns np.array
-  eval_labels = np.asarray(lego.test.labels, dtype=np.int32)
+  #lego = tf.contrib.learn.datasets.load_dataset("lego")
+
+
+
+  train_data = np.load("/usr/src/lego_classification/part_recognition/X_train.npy").astype(dtype="float32")  # Returns np.array
+  train_labels = np.load("/usr/src/lego_classification/part_recognition/Y_train.npy").astype(dtype="int32")
+  eval_data = np.load("/usr/src/lego_classification/part_recognition/X_train.npy").astype(dtype="float32")  # Returns np.array
+  eval_labels =np.load("/usr/src/lego_classification/part_recognition/Y_train.npy").astype(dtype="int32")
 
   # Create the Estimator
   lego_classifier = tf.estimator.Estimator(
