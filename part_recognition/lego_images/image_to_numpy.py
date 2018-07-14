@@ -4,7 +4,8 @@ from PIL import Image
 import numpy as np
 
 #Directory containing images you wish to convert
-input_dir = "/usr/src/lego_classification/part_recognition/lego_images/train"
+input_dir = "/usr/src/lego_classification/part_recognition/lego_images/test"
+#input_dir = "/usr/src/lego_classification/part_recognition/lego_images/image_type_testing"
 
 directories = os.listdir(input_dir)
 directories = sorted(directories)
@@ -35,7 +36,7 @@ for folder in directories:
 				
 				if im.mode == 'RGBA':
 					print("Mode:" + im.mode)
-					print image
+					
 					#im = im.convert('RBG')
 					#im.save(image.toString() + ".jpg")
 					
@@ -83,15 +84,13 @@ for folder in directories:
 
 #print index
 
-np.save(os.path.join('processed_data', 'X_train.npy'), out)
-np.save(os.path.join('processed_data', 'Y_train.npy'), index_array) #Saving train labels
+np.save(os.path.join('processed_data', 'X_test.npy'), out)
+np.save(os.path.join('processed_data', 'Y_test.npy'), index_array) #Saving train labels
 
 print index_array
 print "--------------------"
 print len(out)
 print len(index_array)
-#print out
-
 #str1 = ''.join(str(e) for e in out)
 #print str1
 #print(index_array)
