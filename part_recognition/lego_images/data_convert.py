@@ -59,13 +59,4 @@ def cifar_byte(im, label):
 	out = np.array(list(label) + list(numpy_arr(im)))
 	return out
 
-result = np.array()
-
-# im = Image.open(("/usr/src/lego_classification/part_recognition/lego_images/60" + "/" + 0 + "/" + "IMG_6366.jpg")
-
-
-# for i in range(0, 9):
-# 	for file in os.listdir(input_dir + "/" + i):
-# 		im = Image.open((input_dir + "/" + i + "/" + file)
-# 		test= resize_and_format(im)
-# 		result
+	

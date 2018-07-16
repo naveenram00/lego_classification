@@ -70,7 +70,7 @@ def cnn_model_fn(features, labels, mode):
   # Input Tensor Shape: [batch_size, 7, 7, 64]
   # Output Tensor Shape: [batch_size, 7 * 7 * 64]
   pool2_flat = tf.reshape(pool2, [-1, 8 * 8 * 64])
-  print("hmm?")
+  
   # Dense Layer
   # Densely connected layer with 1024 neurons
   # Input Tensor Shape: [batch_size, 7 * 7 * 64]
@@ -80,7 +80,7 @@ def cnn_model_fn(features, labels, mode):
   # Add dropout operation; 0.6 probability that element will be kept
   dropout = tf.layers.dropout(
       inputs=dense, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-
+  print("hmm?")
   # Logits layer
   # Input Tensor Shape: [batch_size, 1024]
   # Output Tensor Shape: [batch_size, 10]
@@ -101,7 +101,7 @@ def cnn_model_fn(features, labels, mode):
 
   # Configure the Training Op (for TRAIN mode)
   if mode == tf.estimator.ModeKeys.TRAIN:
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.005)
     train_op = optimizer.minimize(
         loss=loss,
         global_step=tf.train.get_global_step())
@@ -114,21 +114,20 @@ def cnn_model_fn(features, labels, mode):
   return tf.estimator.EstimatorSpec(
       mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 
-
 def main(unused_argv):
   # Load training and eval data
   #lego = tf.contrib.learn.datasets.load_dataset("lego")
 
 
 
-  train_data = np.load("/usr/src/lego_classification/part_recognition/X_train.npy").astype(dtype="float32")  # Returns np.array
-  train_labels = np.load("/usr/src/lego_classification/part_recognition/Y_train.npy").astype(dtype="int32")
-  eval_data = np.load("/usr/src/lego_classification/part_recognition/X_train.npy").astype(dtype="float32")  # Returns np.array
-  eval_labels =np.load("/usr/src/lego_classification/part_recognition/Y_train.npy").astype(dtype="int32")
+  train_data = np.load("/usr/src/data/processed_data/X_train.npy").astype(dtype="float32")  # Returns np.array
+  train_labels = np.load("/usr/src/data/processed_data/Y_train.npy").astype(dtype="int32")
+  eval_data = np.load("/usr/src/data/processed_data/X_test.npy").astype(dtype="float32")  # Returns np.array
+  eval_labels =np.load("/usr/src/data/processed_data/Y_test.npy").astype(dtype="int32")
 
   # Create the Estimator
   lego_classifier = tf.estimator.Estimator(
-      model_fn=cnn_model_fn, model_dir="/tmp/lego_convnet_model")
+      model_fn=cnn_model_fn, model_dir="/tmp/new_lego_convnet_model")
 
   # Set up logging for predictions
   # Log the values in the "Softmax" tensor with label "probabilities"
@@ -145,7 +144,7 @@ def main(unused_argv):
       shuffle=True)
   lego_classifier.train(
       input_fn=train_input_fn,
-      steps=20000,
+      steps=40000,
       hooks=[logging_hook])
 
   # Evaluate the model and print results
