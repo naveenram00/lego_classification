@@ -2,7 +2,7 @@ import sys
 import pygame
 import math
 nodes = []
-select_radius = 50
+select_radius = 15
 objects = []
 
 class Node:
