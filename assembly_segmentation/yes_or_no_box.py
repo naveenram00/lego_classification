@@ -16,7 +16,7 @@ def destroy(self):
     
 top = tkinter.Tk()
 def complete():
-    result = tkinter.messagebox.askquestion("Done", "Are You Sure?", icon='warning', bg="#b19cd9")
+    result = tkinter.messagebox.askquestion("Done", "Are You Sure?", icon='warning')
     if result == 'yes':
         print ("Confirmed")
         top.destroy()

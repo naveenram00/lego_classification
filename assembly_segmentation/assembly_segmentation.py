@@ -1,6 +1,18 @@
 import sys
 import pygame
 import math
+from Screenshotter import run, cropper
+
+try:
+    # for Python2
+    from Tkinter import *
+    import Tkinter, Tkconstants, tkFileDialog## notice capitalized T in Tkinter 
+    
+except ImportError:
+    # for Python3
+    from tkinter import filedialog
+    from tkinter import *
+    
 global nodes
 nodes = []
 select_radius = 15
@@ -60,7 +72,9 @@ def select_node(pos, screen):
 def node_selection():
     # Initialize game and create a screen object.
     pygame.init()
-    screen = pygame.display.set_mode((1200, 800))
+    background = pygame.image.load("crop.png")
+    imagerect = background.get_rect()
+    screen = pygame.display.set_mode((1500, 700))
     modes = ["create", "select", "order"]
     mode_index = 0
     select_radius = 50
@@ -118,12 +132,29 @@ def node_selection():
                     for node in nodes:
                         if node.is_selected:
                             nodes.remove(node)
+                if event.key == pygame.K_RETURN:
+                    ordered_nodes = [nodes[0].get_pos()]
+                    nodes_copy = nodes
+                    node = nodes[0]
+                    while len(nodes_copy) > 0:
+                        ordered_nodes.append(node.next_node.get_pos())
+                        nodes.remove(node)
+                        node = node.next_node
+                        
+                    
+                    print(ordered_nodes)
+                    
+                    cropper(ordered_nodes)
+                    background = pygame.image.load("out.png")
+                        
+                        
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
         
         #Draw objects
         screen.fill((255,255,255))
+        screen.blit(background, imagerect)
         for node in nodes:
             #print(screen)
             node.draw(screen)
@@ -131,6 +162,7 @@ def node_selection():
         # Make the most recently drawn screen visible.
         pygame.display.flip()
         pygame.display.update()
-    
+run()
+
 node_selection()
 #node_selection()
