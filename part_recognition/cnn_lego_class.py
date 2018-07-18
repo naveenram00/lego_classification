@@ -65,7 +65,7 @@ def cnn_model_fn(features, labels, mode):
   # Input Tensor Shape: [batch_size, 14, 14, 64]
   # Output Tensor Shape: [batch_size, 7, 7, 64]
   pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
-  print("test")
+  
   # Flatten tensor into a batch of vectors
   # Input Tensor Shape: [batch_size, 7, 7, 64]
   # Output Tensor Shape: [batch_size, 7 * 7 * 64]
@@ -80,7 +80,7 @@ def cnn_model_fn(features, labels, mode):
   # Add dropout operation; 0.6 probability that element will be kept
   dropout = tf.layers.dropout(
       inputs=dense, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-  print("hmm?")
+  
   # Logits layer
   # Input Tensor Shape: [batch_size, 1024]
   # Output Tensor Shape: [batch_size, 10]
@@ -115,7 +115,8 @@ def cnn_model_fn(features, labels, mode):
       mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 
 def main(unused_argv):
-  # Load training and eval data
+  print("test")
+  #Load training and eval data
   #lego = tf.contrib.learn.datasets.load_dataset("lego")
 
 
@@ -127,7 +128,7 @@ def main(unused_argv):
 
   # Create the Estimator
   lego_classifier = tf.estimator.Estimator(
-      model_fn=cnn_model_fn, model_dir="models")
+      model_fn=cnn_model_fn, model_dir="models/model_dir")
   # "/usr/src/lego_classification/part_recognition/models"
   # Set up logging for predictions
   # Log the values in the "Softmax" tensor with label "probabilities"
@@ -135,17 +136,17 @@ def main(unused_argv):
   logging_hook = tf.train.LoggingTensorHook(
       tensors=tensors_to_log, every_n_iter=50)
 
-  # Train the model
-  train_input_fn = tf.estimator.inputs.numpy_input_fn(
-      x={"x": train_data},
-      y=train_labels,
-      batch_size=100,
-      num_epochs=None,
-      shuffle=True)
-  lego_classifier.train(
-      input_fn=train_input_fn,
-      steps=40000,
-      hooks=[logging_hook])
+  # # Train the model
+  # train_input_fn = tf.estimator.inputs.numpy_input_fn(
+  #     x={"x": train_data},
+  #     y=train_labels,
+  #     batch_size=100,
+  #     num_epochs=None,
+  #     shuffle=True)
+  # lego_classifier.train(
+  #     input_fn=train_input_fn,
+  #     steps=40000,
+  #     hooks=[logging_hook])
 
   # Evaluate the model and print results
   eval_input_fn = tf.estimator.inputs.numpy_input_fn(
@@ -155,6 +156,22 @@ def main(unused_argv):
       shuffle=False)
   eval_results = lego_classifier.evaluate(input_fn=eval_input_fn)
   print(eval_results)
+
+  # Classify two new samples.
+  new_samples = np.array(
+      eval_data, dtype=np.float32)
+  predict_input_fn = tf.estimator.inputs.numpy_input_fn(
+      x={"x": new_samples},
+      num_epochs=1,
+      shuffle=False)
+
+  predictions = list(lego_classifier.predict(input_fn=predict_input_fn))
+  predicted_classes = [p["classes"] for p in predictions]
+
+  print(
+      "New Samples, Class Predictions:    {}\n"
+      .format(predicted_classes))
+
 
 
 if __name__ == "__main__":
