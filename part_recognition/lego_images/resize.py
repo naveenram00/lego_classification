@@ -7,6 +7,12 @@ import numpy as np
 #input_dir = "/usr/src/lego_classification/part_recognition/lego_images/lego_images_copy"
 input_dir = "/usr/src/lego_images_cropped"
 
+def resize_square(path, size):
+	im = Image.open(file)	
+	im = crop_white(im)
+	im = make_square(im)
+	im = im.resize((size, size), Image.ANTIALIAS)
+	im.save(path)
 
 
 def listdir_nohidden(path):

@@ -101,7 +101,7 @@ def cnn_model_fn(features, labels, mode):
 
   # Configure the Training Op (for TRAIN mode)
   if mode == tf.estimator.ModeKeys.TRAIN:
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.005)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.0005)
     train_op = optimizer.minimize(
         loss=loss,
         global_step=tf.train.get_global_step())
@@ -127,8 +127,8 @@ def main(unused_argv):
 
   # Create the Estimator
   lego_classifier = tf.estimator.Estimator(
-      model_fn=cnn_model_fn, model_dir="/tmp/new_lego_convnet_model")
-
+      model_fn=cnn_model_fn, model_dir="/tmp/lego_convnet_model")
+  # "/usr/src/lego_classification/part_recognition/models"
   # Set up logging for predictions
   # Log the values in the "Softmax" tensor with label "probabilities"
   tensors_to_log = {"probabilities": "softmax_tensor"}
@@ -144,7 +144,7 @@ def main(unused_argv):
       shuffle=True)
   lego_classifier.train(
       input_fn=train_input_fn,
-      steps=40000,
+      steps=10000,
       hooks=[logging_hook])
 
   # Evaluate the model and print results
