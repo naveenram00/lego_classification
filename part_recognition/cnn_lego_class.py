@@ -127,7 +127,7 @@ def main(unused_argv):
 
   # Create the Estimator
   lego_classifier = tf.estimator.Estimator(
-      model_fn=cnn_model_fn, model_dir="/tmp/lego_convnet_model")
+      model_fn=cnn_model_fn, model_dir="models")
   # "/usr/src/lego_classification/part_recognition/models"
   # Set up logging for predictions
   # Log the values in the "Softmax" tensor with label "probabilities"
@@ -144,7 +144,7 @@ def main(unused_argv):
       shuffle=True)
   lego_classifier.train(
       input_fn=train_input_fn,
-      steps=10000,
+      steps=40000,
       hooks=[logging_hook])
 
   # Evaluate the model and print results
