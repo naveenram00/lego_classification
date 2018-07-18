@@ -3,6 +3,7 @@ import pygame
 import math
 from Screenshotter import run, cropper
 
+
 try:
     # for Python2
     from Tkinter import *
@@ -13,6 +14,7 @@ except ImportError:
     from tkinter import filedialog
     from tkinter import *
     
+
 global nodes
 nodes = []
 select_radius = 15
@@ -26,9 +28,9 @@ class Node:
         self.next_node = None
     
     def deselect(self):
-       self.is_selected = False
+        self.is_selected = False
     def select(self):
-       self.is_selected = True
+        self.is_selected = True
         
     def get_pos(self):
         return (self.x, self.y)
@@ -36,7 +38,11 @@ class Node:
     def shift(self, x, y):
         self.x += x
         self.y += y
-        
+    
+    def move_to(self, pos):
+        self.x = pos[0]
+        self.y = pos[1]
+    
     def draw(self, screen):
         if self.is_selected:
             pygame.draw.circle(screen, (0, 255, 255), (self.x, self.y), 6, 0)
@@ -75,9 +81,9 @@ def node_selection():
     background = pygame.image.load("crop.png")
     imagerect = background.get_rect()
     screen = pygame.display.set_mode((1500, 700))
-    modes = ["create", "select", "order"]
+    modes = ["create", "select", "order", "move"]
     mode_index = 0
-    select_radius = 50
+    select_radius = 60
     n = 0
     selected = []
     pygame.display.set_caption("Node Selection")
@@ -122,27 +128,67 @@ def node_selection():
                     else:
                         selected.next_node = select_node(pygame.mouse.get_pos(), screen)
                         
+                if mode == "move":
+                    
+                    node_selected = False
+                    
+                    for node in nodes:
+                        if node.is_selected:
+                            node_selected = True
+                    if not node_selected:
+                        select_node(pygame.mouse.get_pos(), screen)
+                    else:
+                    
+                        for node in nodes:
+                            if node.is_selected:
+
+                                node.move_to(pygame.mouse.get_pos())
+                                node.deselect()
+                                
+#                             if selected == 0:
+#                                 select_node(pygame.mouse.get_pos(), screen)
+#                             else:
+#                                 selected.next_node = select_node(pygame.mouse.get_pos(), screen)
+                            
+                        
                     
                                    
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     mode_index += 1
                     print("Mode: " + modes[mode_index % len(modes)])
+                elif event.key == pygame.K_LEFT:
+                    mode_index = abs(mode_index-1)
+                    print("Mode: " + modes[mode_index % len(modes)])
                 if event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
                     for node in nodes:
                         if node.is_selected:
                             nodes.remove(node)
                 if event.key == pygame.K_RETURN:
-                    ordered_nodes = [nodes[0].get_pos()]
-                    nodes_copy = nodes
-                    node = nodes[0]
+                    print(nodes)
+#                     for node in nodes:
+#                         if node.next_node == None:
+#                             nodes.remove(node)
+#                     print(nodes)
+                    
+                    nodes_copy = [x for x in nodes if not x.next_node == None]
+                   
+                    print(nodes_copy) 
+                    for node in nodes_copy:
+                        print(node.next_node)
+                    
+                    ordered_nodes = [nodes_copy[0].get_pos()]
+                    #nodes_copy = nodes
+                    node = nodes_copy[0]
                     while len(nodes_copy) > 0:
                         ordered_nodes.append(node.next_node.get_pos())
-                        nodes.remove(node)
+                        nodes_copy.remove(node)
                         node = node.next_node
+                    nodes.clear()
+                    nodes.extend(nodes_copy)
                         
                     
-                    print(ordered_nodes)
+#                     print(ordered_nodes)
                     
                     cropper(ordered_nodes)
                     background = pygame.image.load("out.png")
