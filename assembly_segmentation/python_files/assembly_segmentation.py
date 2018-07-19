@@ -5,7 +5,7 @@ import os
 from PIL import Image, ImageChops
 import numpy as np
 from Screenshotter import run, cropper
-from resize import resize_square
+from resize import resizes
 
 
 try:
@@ -262,7 +262,7 @@ def init():
                     
                     cropper(ordered_nodes)
                     background = pygame.image.load("out.png")
-                    #resize_square("out.png", 224)
+                    resizes(224)
                         
                         
             if event.type == pygame.QUIT:
