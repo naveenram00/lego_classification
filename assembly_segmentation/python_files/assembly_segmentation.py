@@ -2,21 +2,22 @@ import sys
 import pygame
 import math
 import os
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops 
 import numpy as np
 from Screenshotter import run, cropper
-from resize import resizes
+from resize import resize_square
 
 
-try:
-    # for Python2
-    from Tkinter import *
-    import Tkinter, Tkconstants, tkFileDialog## notice capitalized T in Tkinter 
+# try:
+#     # for Python2
+#     from Tkinter import *
+#     import tkFileDialog as filedialog
+#     import Tkconstants, tkFileDialog## notice capitalized T in Tkinter 
     
-except ImportError:
-    # for Python3
-    from tkinter import filedialog
-    from tkinter import *
+# except ImportError:
+#     # for Python3
+#     from tkinter import filedialog
+#     from tkinter import *
     
 
 global nodes
@@ -254,7 +255,7 @@ def init():
                         ordered_nodes.append(node.next_node.get_pos())
                         nodes_copy.remove(node)
                         node = node.next_node
-                    nodes.clear()
+                    del nodes[:]
                     nodes.extend(nodes_copy)
                         
                     
@@ -262,7 +263,7 @@ def init():
                     
                     cropper(ordered_nodes)
                     background = pygame.image.load("out.png")
-                    resizes(224)
+                    
                         
                         
             if event.type == pygame.QUIT:
@@ -284,4 +285,6 @@ def init():
 run()
 
 init()
+
+resize_square("out.png", 224)
 #node_selection()

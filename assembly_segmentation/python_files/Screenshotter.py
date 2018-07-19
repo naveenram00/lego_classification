@@ -45,10 +45,10 @@ def run():
             break
         k = cv2.waitKey(1)
 
-        #if k%256 == 27:
-            # ESC pressed
-            # print("Closing...")
-            # break
+        if k%256 == 27:
+            #ESC pressed
+            print("Closing...")
+            break
         if k%256 == 32:
             # SPACE pressed
             img_name = ("crop.png")
@@ -57,7 +57,11 @@ def run():
             break
 
     cam.release()
-
+    print("test")
+    
+    cv2.waitKey(1)
     cv2.destroyAllWindows()
-
-    #cropper()
+    for i in range (1,5):
+        cv2.waitKey(1)
+    
+    #cropper()apt
