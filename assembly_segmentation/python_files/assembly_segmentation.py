@@ -6,6 +6,8 @@ from PIL import Image, ImageChops
 import numpy as np
 from Screenshotter import run, cropper
 from resize import resize_square
+sys.path.append("/usr/src/lego_classification/part_recognition/lego_images")
+import cnn_lego_class.py as classifier
 
 
 # try:
@@ -287,4 +289,6 @@ run()
 init()
 
 resize_square("out.png", 224)
+
+classifier.classify("/usr/src/lego_classification/assembly_recognition/python_files/out.png")
 #node_selection()

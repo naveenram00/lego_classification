@@ -7,11 +7,44 @@ import numpy as np
 #input_dir = "/usr/src/lego_classification/part_recognition/lego_images/lego_images_copy"
 input_dir = "/usr/src/lego_images_cropped"
 
+def png_to_array(path):
+	im = Image.open(path)
+	if im.mode == 'RGBA':
+		print("Mode:" + im.mode)
+		
+		#im = im.convert('RBG')
+		#im.save(image.toString() + ".jpg")
+		
+		im.load() # required for png.split()
+
+		background = Image.new("RGB", im.size, (255, 255, 255))
+		background.paste(im, mask=im.split()[3]) # 3 is the alpha channel
+
+		#background.save(image + '.jpg', 'JPEG', quality=80)
+		im = background
+
+	if im.mode == 'L':
+
+		rgbim = Image.new("RGB", im.size)
+		rgbim.paste(im)
+		im = rgbim
+	im = crop_white(im)
+	im = make_square(im)
+	im = im.resize((32, 32), Image.ANTIALIAS)
+	im = (np.array(im))
+
+	r = im[:,:,0] #Slicing to get R data
+	g = im[:,:,1] #Slicing to get G data
+	b = im[:,:,2] #Slicing to get B data
+
+	out = np.array([r] + [g] + [b],np.uint8)
+	return out
+
 def resize_square(path, size):
 	im = Image.open(file)	
 	im = crop_white(im)
 	im = make_square(im)
-	im = im.resize((size, size), Image.ANTIALIAS)
+	im = im.resize((32, 32), Image.ANTIALIAS)
 	im.save(path)
 
 

@@ -17,8 +17,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import sys
 import numpy as np
 import tensorflow as tf
+
+sys.path.append("/usr/src/lego_classification/part_recognition/lego_images")
+import resize as re
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
@@ -101,7 +105,7 @@ def cnn_model_fn(features, labels, mode):
 
   # Configure the Training Op (for TRAIN mode)
   if mode == tf.estimator.ModeKeys.TRAIN:
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.0005)
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.0001)
     train_op = optimizer.minimize(
         loss=loss,
         global_step=tf.train.get_global_step())
@@ -113,6 +117,26 @@ def cnn_model_fn(features, labels, mode):
           labels=labels, predictions=predictions["classes"])}
   return tf.estimator.EstimatorSpec(
       mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
+
+def classify (tensor):
+  # Create the Estimator
+  lego_classifier = tf.estimator.Estimator(
+      model_fn=cnn_model_fn, model_dir="models/9_part_model_old")
+  # Classify two new samples.
+  new_samples = np.array(
+      tensor, dtype=np.float32)
+  predict_input_fn = tf.estimator.inputs.numpy_input_fn(
+      x={"x": new_samples},
+      num_epochs=1,
+      shuffle=False)
+
+  predictions = list(lego_classifier.predict(input_fn=predict_input_fn))
+  predicted_classes = [p["classes"] for p in predictions]
+
+  print(
+      "New Samples, Class Predictions:    {}\n"
+      .format(predicted_classes))
+  return predicted_classes
 
 def main(unused_argv):
   #Load training and eval data
@@ -141,7 +165,7 @@ def main(unused_argv):
  
   # Create the Estimator
   lego_classifier = tf.estimator.Estimator(
-      model_fn=cnn_model_fn, model_dir="models/cheating_model")
+      model_fn=cnn_model_fn, model_dir="models/9_part_model_old")
   # "/usr/src/lego_classification/part_recognition/models"
   # Set up logging for predictions
   # Log the values in the "Softmax" tensor with label "probabilities"
@@ -149,28 +173,28 @@ def main(unused_argv):
   logging_hook = tf.train.LoggingTensorHook(
       tensors=tensors_to_log, every_n_iter=50)
 
-  # Train the model
-  train_input_fn = tf.estimator.inputs.numpy_input_fn(
-      x={"x": train_data},
-      y=train_labels,
-      batch_size=100,
-      num_epochs=None,
-      shuffle=True)
-  lego_classifier.train(
-      input_fn=train_input_fn,
-      steps=40000,
-      hooks=[logging_hook])
+  # # Train the model
+  # train_input_fn = tf.estimator.inputs.numpy_input_fn(
+  #     x={"x": train_data},
+  #     y=train_labels,
+  #     batch_size=100,
+  #     num_epochs=None,
+  #     shuffle=True)
+  # lego_classifier.train(
+  #     input_fn=train_input_fn,
+  #     steps=20000,
+  #     hooks=[logging_hook])
 
-  # Evaluate the model and print results
-  eval_input_fn = tf.estimator.inputs.numpy_input_fn(
-      x={"x": eval_data},
-      y=eval_labels,
-      num_epochs=1,
-      shuffle=False)
-  eval_results = lego_classifier.evaluate(input_fn=eval_input_fn)
-  print(eval_results)
+  # # Evaluate the model and print results
+  # eval_input_fn = tf.estimator.inputs.numpy_input_fn(
+  #     x={"x": eval_data},
+  #     y=eval_labels,
+  #     num_epochs=1,
+  #     shuffle=False)
+  # eval_results = lego_classifier.evaluate(input_fn=eval_input_fn)
+  # print(eval_results)
 
-  # # Classify two new samples.
+  # Classify two new samples.
   # new_samples = np.array(
   #     eval_data, dtype=np.float32)
   # predict_input_fn = tf.estimator.inputs.numpy_input_fn(
@@ -185,6 +209,10 @@ def main(unused_argv):
   #     "New Samples, Class Predictions:    {}\n"
   #     .format(predicted_classes))
 
+  tensor = re.png_to_array("/usr/src/lego_classification/part_recognition/lego_images/test_part.png")
+  #print(tensor.shape)
+  #print(eval_data[1].shape)
+  print(classify(list(tensor)))
 
 
 if __name__ == "__main__":
