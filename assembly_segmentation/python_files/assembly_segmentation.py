@@ -5,9 +5,8 @@ import os
 from PIL import Image, ImageChops 
 import numpy as np
 from Screenshotter import run, cropper
-from resize import resize_square
-sys.path.append("/usr/src/lego_classification/part_recognition/lego_images")
-import cnn_lego_class.py as classifier
+#from resize import resize_square
+
 
 
 # try:
@@ -265,7 +264,10 @@ def init():
                     
                     cropper(ordered_nodes)
                     background = pygame.image.load("out.png")
-                    
+
+                    sys.path.append("/usr/src/lego_classification/part_recognition")
+                    import lego_class_module as classifier
+                    print(classifier.classify("out.png"))
                         
                         
             if event.type == pygame.QUIT:
@@ -285,10 +287,10 @@ def init():
         pygame.display.flip()
         pygame.display.update()
 run()
-
+print("test")
 init()
 
-resize_square("out.png", 224)
+#resize_square("out.png", 224)
 
-classifier.classify("/usr/src/lego_classification/assembly_recognition/python_files/out.png")
-#node_selection()
+c#lassifier.classify("/usr/src/lego_classification/assembly_recognition/python_files/out.png")
+#node_selection()cd -

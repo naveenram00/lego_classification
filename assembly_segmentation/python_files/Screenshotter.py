@@ -65,3 +65,4 @@ def run():
         cv2.waitKey(1)
     
     #cropper()apt
+run()
