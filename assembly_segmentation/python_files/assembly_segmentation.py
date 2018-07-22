@@ -32,6 +32,15 @@ BLUE = (0, 0, 255)
 PURPLE = (69, 61, 85)
 L_PURPLE =(69,61, 150)
 BLACK = (0, 0, 0)
+global part
+parts = {0 : "Red 2x1", 1 : "Grey 4x1", 2 : "Black Tire", 3 : "Grey 8x2", 4 : "Grey 6x2", 
+        5 : "Yellow Corner", 6 : "Yellow Head", 7 : "Grey Handle", 8 : "Yellow Axle", 9 : "Blue Stud"}
+global instructions
+instructions = {0 : "replace with newer design (part 3004)", 1 : "needs cleaning/maintanence", 
+        2 : "check tire pressure", 3 : "replace with two 3x2s", 4 : "replace with two 4x2s", 
+        5 : "reinforce with more brackets", 6 : "add hat", 7 : "replace with more visible color",
+        8 : "check allignment", 9 : "remove and reapply"}
+
 
 class Node:
     def __init__(self,x_init,y_init):
@@ -267,8 +276,11 @@ def init():
 
                     sys.path.append("/usr/src/lego_classification/part_recognition")
                     import lego_class_module as classifier
-                    print(classifier.classify("out.png"))
-                        
+                    part_number = classifier.classify("out.png")[0]
+                    print ("--------------")
+                    print ("Part Number: " + str(part_number))
+                    print("Part: " + parts[part_number])
+                    print("Repair Instructions: " + instructions[part_number])
                         
             if event.type == pygame.QUIT:
                 pygame.quit()
