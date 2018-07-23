@@ -1,0 +1,3 @@
+[submodule "assembly_segmentation/polyrnn-pp"]
+	path = assembly_segmentation/polyrnn-pp
+	url = https://github.com/davidjesusacu/polyrnn-pp
