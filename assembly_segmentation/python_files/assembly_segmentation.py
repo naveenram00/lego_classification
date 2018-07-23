@@ -42,6 +42,7 @@ instructions = {0 : "replace with newer design (part 3004)", 1 : "needs cleaning
         8 : "check allignment", 9 : "remove and reapply"}
 
 
+
 class Node:
     def __init__(self,x_init,y_init):
         self.x = x_init
@@ -134,10 +135,23 @@ def buttons(screen):
         screen.blit(textSurf, textRect)
 
 
+def segment_screenshot():
+    import resize as re
+    re.resize_square("crop.png", 530)
+    re.resize_square("for_segmentation.png", 224)
+    sys.path.append("/usr/src/lego_classification/polyrnn-pp/src")
+    import polyrnn_module as pm
+    poly = pm.segment_image("for_segmentation.jpg")
+    l, w = 530, 530
+
+    y_offset = 640-530/2
+    for point in poly:
+        nodes.append(Node(int(point[0]*l), int((point[1]*w))))
+
 def init():
     # Initialize game and create a screen object.
     pygame.init()
-    background = pygame.image.load("crop.png")
+    background = pygame.image.load("crop.jpg")
     imagerect = background.get_rect()
     screen = pygame.display.set_mode((640, 530))
     global modes
@@ -298,7 +312,11 @@ def init():
         # Make the most recently drawn screen visible.
         pygame.display.flip()
         pygame.display.update()
+
+
+
 run()
+segment_screenshot()
 print("test")
 init()
 

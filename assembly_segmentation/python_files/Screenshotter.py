@@ -53,6 +53,8 @@ def run():
             # SPACE pressed
             img_name = ("crop.png")
             cv2.imwrite(img_name, frame)
+            img_name = ("for_segmentation.png")
+            cv2.imwrite(img_name, frame)
             #print("{} written!".format(img_name))
             break
 
