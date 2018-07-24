@@ -128,7 +128,7 @@ def classify (path):
 
   # Create the Estimator
   lego_classifier = tf.estimator.Estimator(
-      model_fn=cnn_model_fn, model_dir="/usr/src/lego_classification/part_recognition/models/9_part_model_old")
+      model_fn=cnn_model_fn, model_dir="/usr/src/lego_classification/part_recognition/models/9_part_model_92")
   # Classify two new samples.
   new_samples = np.array(
       list(tensor), dtype=np.float32)

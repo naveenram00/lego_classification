@@ -121,7 +121,7 @@ def cnn_model_fn(features, labels, mode):
 def classify (tensor):
   # Create the Estimator
   lego_classifier = tf.estimator.Estimator(
-      model_fn=cnn_model_fn, model_dir="models/9_part_model_new")
+      model_fn=cnn_model_fn, model_dir="models/9_part_model_92")
   # Classify two new samples.
   new_samples = np.array(
       tensor, dtype=np.float32)
@@ -165,49 +165,49 @@ def main(unused_argv):
  
   # Create the Estimator
   lego_classifier = tf.estimator.Estimator(
-      model_fn=cnn_model_fn, model_dir="models/9_part_model_new")
+      model_fn=cnn_model_fn, model_dir="models/9_part_model_92")
   "/usr/src/lego_classification/part_recognition/models"
-  Set up logging for predictions
-  Log the values in the "Softmax" tensor with label "probabilities"
+  #Set up logging for predictions
+  #Log the values in the "Softmax" tensor with label "probabilities"
   tensors_to_log = {"probabilities": "softmax_tensor"}
   logging_hook = tf.train.LoggingTensorHook(
       tensors=tensors_to_log, every_n_iter=50)
 
-  # Train the model
-  train_input_fn = tf.estimator.inputs.numpy_input_fn(
-      x={"x": train_data},
-      y=train_labels,
-      batch_size=100,
-      num_epochs=None,
-      shuffle=True)
-  lego_classifier.train(
-      input_fn=train_input_fn,
-      steps=20000,
-      hooks=[logging_hook])
+  # # Train the model
+  # train_input_fn = tf.estimator.inputs.numpy_input_fn(
+  #     x={"x": train_data},
+  #     y=train_labels,
+  #     batch_size=100,
+  #     num_epochs=None,
+  #     shuffle=True)
+  # lego_classifier.train(
+  #     input_fn=train_input_fn,
+  #     steps=200,
+  #     hooks=[logging_hook])
 
-  # Evaluate the model and print results
-  eval_input_fn = tf.estimator.inputs.numpy_input_fn(
-      x={"x": eval_data},
-      y=eval_labels,
-      num_epochs=1,
-      shuffle=False)
-  eval_results = lego_classifier.evaluate(input_fn=eval_input_fn)
-  print(eval_results)
-
-  # Classify two new samples.
-  # new_samples = np.array(
-  #     eval_data, dtype=np.float32)
-  # predict_input_fn = tf.estimator.inputs.numpy_input_fn(
-  #     x={"x": new_samples},
+  # # Evaluate the model and print results
+  # eval_input_fn = tf.estimator.inputs.numpy_input_fn(
+  #     x={"x": eval_data},
+  #     y=eval_labels,
   #     num_epochs=1,
   #     shuffle=False)
+  # eval_results = lego_classifier.evaluate(input_fn=eval_input_fn)
+  # print(eval_results)
 
-  # predictions = list(lego_classifier.predict(input_fn=predict_input_fn))
-  # predicted_classes = [p["classes"] for p in predictions]
+  # Classify two new samples.
+  new_samples = np.array(
+      eval_data, dtype=np.float32)
+  predict_input_fn = tf.estimator.inputs.numpy_input_fn(
+      x={"x": new_samples},
+      num_epochs=1,
+      shuffle=False)
 
-  # print(
-  #     "New Samples, Class Predictions:    {}\n"
-  #     .format(predicted_classes))
+  predictions = list(lego_classifier.predict(input_fn=predict_input_fn))
+  predicted_classes = [p["classes"] for p in predictions]
+
+  print(
+      "New Samples, Class Predictions:    {}\n"
+      .format(predicted_classes))
 
   # tensor = re.png_to_array("/usr/src/lego_classification/part_recognition/lego_images/test_part.png")
   #print(tensor.shape)
