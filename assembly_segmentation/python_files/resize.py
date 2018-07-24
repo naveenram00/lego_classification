@@ -25,8 +25,28 @@ def resize_square(path, size):
 		rgbim = Image.new("RGB", im.size)
 		rgbim.paste(im)
 		im = rgbim
+
+def resize_square_upper(path, size):
+	im = Image.open(path)
+	if im.mode == 'RGBA':
+		print("Mode:" + im.mode)
 		
-	im = make_square(im)
+		#im = im.convert('RBG')
+		#im.save(image.toString() + ".jpg")
+		
+		im.load() # required for png.split()
+
+		background = Image.new("RGB", im.size, (255, 255, 255))
+		background.paste(im, mask=im.split()[3]) # 3 is the alpha channel
+		im = background
+
+	if im.mode == 'L':
+
+		rgbim = Image.new("RGB", im.size)
+		rgbim.paste(im)
+		im = rgbim
+		
+	im = make_square_upper(im)
 	im = im.resize((size, size), Image.ANTIALIAS)
 	im.save(path[:-4]+ ".jpg")
 
@@ -45,7 +65,7 @@ def test(file):
 	im = make_square(im)
 	im.save(file)
 
-def make_square(im):
+def make_square_centered(im):
 
 	fill_color = (255, 255, 255, 0)
 
@@ -53,5 +73,16 @@ def make_square(im):
 	size = max(x, y)
 	new_im = Image.new('RGB', (size, size), fill_color)
 	new_im.paste(im, ((size - x) / 2, (size - y) / 2))
+	
+	return new_im
+
+def make_square_upper(im):
+
+	fill_color = (255, 255, 255, 0)
+
+	x, y = im.size
+	size = max(x, y)
+	new_im = Image.new('RGB', (size, size), fill_color)
+	new_im.paste(im, (0, 0))
 	return new_im
 

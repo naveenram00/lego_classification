@@ -137,16 +137,18 @@ def buttons(screen):
 
 def segment_screenshot():
     import resize as re
-    re.resize_square("crop.png", 530)
-    re.resize_square("for_segmentation.png", 224)
+    #re.resize_square("crop.png", 530)
+    #re.resize_square("for_segmentation.png", 224)
     sys.path.append("/usr/src/lego_classification/polyrnn-pp/src")
     import polyrnn_module as pm
     poly = pm.segment_image("for_segmentation.jpg")
-    l, w = 530, 530
+    l, w = 640, 640
 
-    y_offset = 640-530/2
     for point in poly:
         nodes.append(Node(int(point[0]*l), int((point[1]*w))))
+    nodes[-1].next_node=nodes[0]
+    for i in range(len(nodes)-1):
+        nodes[i].next_node = nodes[i+1]
 
 def init():
     # Initialize game and create a screen object.
@@ -258,7 +260,27 @@ def init():
                 if event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
                     for node in nodes:
                         if node.is_selected:
-                            nodes.remove(node)
+
+                            nn = node.next_node
+                            pn = None
+
+                            for node2 in nodes:
+                                if node2.next_node == node:
+                                    pn = node2
+                            if (nn == None and pn == None):
+                                nodes.remove(node)
+                            elif ((not nn == None) and pn == None):
+                                node.next_node = None
+                                nodes.remove(node)
+                                nn.is_selected = True
+                            elif ((not pn == None) and nn == None):
+                                pn.next_node = None
+                                nodes.remove(node)
+                            else:
+                                pn.next_node = nn
+                                nodes.remove(node)
+                                nn.is_selected = True
+
                 if event.key == pygame.K_RETURN:
                     print(nodes)
 #                     for node in nodes:

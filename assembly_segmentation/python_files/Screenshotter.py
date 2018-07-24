@@ -1,7 +1,7 @@
 import cv2
 import numpy
 from PIL import Image, ImageDraw
-
+import resize as re
 def cropper(nodes):
 
     # read image as RGB and add alpha (transparency)
@@ -31,15 +31,29 @@ def cropper(nodes):
     newIm.save("out.png")
 
 def run():
+    # cam = cv2.VideoCapture(0)
+
+    # cv2.namedWindow("Photo Capture",  cv2.WINDOW_NORMAL)
+    # cv2.resizeWindow("Photo Capture", 1500, 700)
+    # img_counter = 0
+    # cam.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
+    # cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 640)
+    # cam.set(3,530)
+    # cam.set(4,530)
+
+    cam = cv2.VideoCapture()
+    cam.open(0)
+    # set frame width and height
+    cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1000)
+    cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1000)
+    print("width:")
+    print(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
     
-    cam = cv2.VideoCapture(0)
-
-    cv2.namedWindow("Photo Capture",  cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Photo Capture", 1500, 700)
-    img_counter = 0
-
     while True:
+
+
         ret, frame = cam.read()
+
         cv2.imshow("Photo Capture", frame)
         if not ret:
             break
@@ -53,8 +67,10 @@ def run():
             # SPACE pressed
             img_name = ("crop.png")
             cv2.imwrite(img_name, frame)
+            re.resize_square_upper("crop.png", 640)
             img_name = ("for_segmentation.png")
             cv2.imwrite(img_name, frame)
+            re.resize_square_upper("for_segmentation.png",224)
             #print("{} written!".format(img_name))
             break
 
