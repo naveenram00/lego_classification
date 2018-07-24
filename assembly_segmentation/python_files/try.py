@@ -34,7 +34,7 @@ COLOR_BLUE = (12, 12, 200)
 COLOR_BACKGROUND = [128, 0, 128]
 COLOR_WHITE = (255, 255, 255)
 FPS = 60
-H_SIZE = 480  # Height of window size
+H_SIZE = 540  # Height of window size
 HELP = ['Press LEFT/RIGHT to change modes',
         '  Create: Click to create nodes',
         '  Select: Click to select node (Delete with BACKSPACE)',
@@ -130,7 +130,7 @@ def mainmenu_background():
 # Help menu
 help_menu = pygameMenu.TextMenu(surface,
                                 dopause=False,
-                                font=(pygameMenu.fonts.FONT_FRANCHISE, 40),
+                                font=pygameMenu.fonts.FONT_FRANCHISE, 40,
                                 menu_color=(30, 50, 107),  # Background color
                                 menu_color_title=(120, 45, 30),
                                 onclose=PYGAME_MENU_DISABLE_CLOSE,  # Pressing ESC button does nothing
@@ -167,12 +167,17 @@ menu = pygameMenu.Menu(surface,
                        bgfun=mainmenu_background,
                        enabled=False,
                        font=pygameMenu.fonts.FONT_NEVIS,
+                       font_size=40,
                        menu_alpha=90,
+                       menu_color=MENU_BACKGROUND_COLOR,
+                       menu_height = int(H_SIZE * 0.6),
+                       menu_width = int(W_SIZE * 0.6,
                        onclose=PYGAME_MENU_CLOSE,
+                       option_shadow=True,
                        title='Main Menu',
                        title_offsety=5,
-                       window_height=400,
-                       window_width=400
+                       window_height=H_SIZE,
+                       window_width=W_SIZE
                        )
 # menu.add_option(timer_menu.get_title(), timer_menu)  # Add timer submenu
 menu.add_option(help_menu.get_title(), help_menu)  # Add help submenu
