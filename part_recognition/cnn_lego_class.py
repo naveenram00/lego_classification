@@ -142,6 +142,7 @@ def main(unused_argv):
   #Load training and eval data
   # lego = tf.contrib.learn.datasets.load_dataset("lego")
 
+  # CODE TO SET UP DATA AND CREATE THE ESTIMATOR
 
 
   train_data = np.load("/usr/src/data/processed_data/X_train.npy").astype(dtype="float32")  # Returns np.array
@@ -173,6 +174,8 @@ def main(unused_argv):
   logging_hook = tf.train.LoggingTensorHook(
       tensors=tensors_to_log, every_n_iter=50)
 
+  # CODE TO TRAIN AND EVALUATE THE MODEL
+
   # # Train the model
   # train_input_fn = tf.estimator.inputs.numpy_input_fn(
   #     x={"x": train_data},
@@ -193,6 +196,9 @@ def main(unused_argv):
   #     shuffle=False)
   # eval_results = lego_classifier.evaluate(input_fn=eval_input_fn)
   # print(eval_results)
+
+
+  # CODE TO SHOW WHAT IT PREDICTED FOR ALL THE PARTS
 
   # Classify two new samples.
   new_samples = np.array(
