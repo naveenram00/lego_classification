@@ -1,215 +1,303 @@
-# coding=utf-8
-"""
-EXAMPLE 1
-Example file, timer clock with in-menu options.
-Copyright (C) 2017-2018 Pablo Pizarro @ppizarror
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-"""
-
-# Import pygame and libraries
-from random import randrange
-import datetime
-import os
 import pygame
 from pygame.locals import *
-
-# Import pygameMenu
+import cv2
+import numpy as np
+import sys
+import os
 import pygameMenu
 from pygameMenu.locals import *
 
-# -----------------------------------------------------------------------------
-# Constants and global variables
-ABOUT = ['PygameMenu {0}'.format(pygameMenu.__version__),
-         'Author: {0}'.format(pygameMenu.__author__),
-         PYGAMEMENU_TEXT_NEWLINE,
-         'Email: {0}'.format(pygameMenu.__email__)]
-COLOR_BLUE = (12, 12, 200)
-COLOR_BACKGROUND = [128, 0, 128]
-COLOR_WHITE = (255, 255, 255)
-FPS = 60
-H_SIZE = 540  # Height of window size
-HELP = ['Press LEFT/RIGHT to change modes',
-        '  Create: Click to create nodes',
-        '  Select: Click to select node (Delete with BACKSPACE)',
-        '  Order: Click on two existing nodes to connect them',
-        '  Move: Select existing node and click new location to move']
-W_SIZE = 480  # Width of window size
+#-----------------------------------------------
 
-# -----------------------------------------------------------------------------
-# Init pygame
-pygame.init()
-os.environ['SDL_VIDEO_CENTERED'] = '1'
-
-# Write help message on console
-for m in HELP:
-    print(m)
-
-# Create window
-surface = pygame.display.set_mode((W_SIZE, H_SIZE))
-pygame.display.set_caption('PygameMenu example')
-
-# Main timer and game clock
-clock = pygame.time.Clock()
-timer = [0.0]
-dt = 1.0 / FPS
-timer_font = pygame.font.Font(pygameMenu.fonts.FONT_NEVIS, 100)
-
-
-# -----------------------------------------------------------------------------
 def mainmenu_background():
     """
     Background color of the main menu, on this function user can plot
     images, play sounds, etc.
     """
-    surface.fill((0, 0, 0))
+    screen.fill((40, 0, 40))
 
+HELP = ['       ',
+        
+        'Currently in Object Capture',
+        '-----------------------------',
+        'Press SPACEBAR to capture camera image',
+        'Escape this window by EXIT in menu',
+        '       ',
+        
+#         'Press LEFT/RIGHT to change modes',
+#         '  Create: Click to create nodes',
+#         '  Select: Click to select node (Delete with BACKSPACE)',
+#         '  Order: Click on two existing nodes to connect them',
+#         '  Move: Click to move selected node to location'
+       ]
 
-# def reset_timer():
-#     """
-#     Reset timer
-#     """
-#     timer[0] = 0
+global nodes
+nodes = []
 
+select_radius = 15
+objects = []
+BLUE = (12, 12, 200)
+COLOR_BACKGROUND = [128, 0, 128]
+WHITE = (255, 255, 255)
+PURPLE = (69, 61, 85)
+L_PURPLE =(69,61, 150)
+BLACK = (0, 0, 0)
+H_SIZE = 600  # Height of window size
+W_SIZE = 600  # Width of window size
 
-# def change_color_bg(c, **kwargs):
-#     """
-#     Change background color
-    
-#     :param c: Color tuple
-#     """
-#     if c == (-1, -1, -1):  # If random color
-#         c = (randrange(0, 255), randrange(0, 255), randrange(0, 255))
-#     if kwargs['write_on_console']:
-#         print('New background color: ({0},{1},{2})'.format(*c))
-#     COLOR_BACKGROUND[0] = c[0]
-#     COLOR_BACKGROUND[1] = c[1]
-#     COLOR_BACKGROUND[2] = c[2]
+#-----------------------------------------------
 
+cam = cv2.VideoCapture(0)
 
-# -----------------------------------------------------------------------------
-# Timer menu
-# timer_menu = pygameMenu.Menu(surface,
-#                              dopause=False,
-#                              font=pygameMenu.fonts.FONT_NEVIS,
-#                              menu_alpha=85,
-#                              menu_color=(0, 0, 0),  # Background color
-#                              menu_color_title=(0, 0, 0),
-#                              menu_height=int(H_SIZE / 2),
-#                              menu_width=600,
-#                              onclose=PYGAME_MENU_RESET,  # If this menu closes (press ESC) back to main
-#                              title='Timer Menu',
-#                              title_offsety=5,  # Adds 5px to title vertical position
-#                              window_height=H_SIZE,
-#                              window_width=W_SIZE
-#                              )
-# timer_menu.add_option('Reset timer', reset_timer)
+pygame.init()
+os.environ['SDL_VIDEO_CENTERED'] = '1'
 
-# # Adds a selector (element that can handle functions)
-# timer_menu.add_selector('Change bgcolor',
-#                         # Values of selector, call to change_color_bg
-#                         [('Random', (-1, -1, -1)),
-#                          ('Default', (128, 0, 128)),
-#                          ('Black', (0, 0, 0)),
-#                          ('Blue', COLOR_BLUE)],
-#                         onchange=None,  # Action when changing element with left/right
-#                         onreturn=change_color_bg,  # Action when pressing return on a element
-#                         default=1,  # Optional parameter that sets default item of selector
-#                         write_on_console=True  # Optional parametrs to change_color_bg function
-#                         )
-# timer_menu.add_option('Return to Menu', PYGAME_MENU_BACK)
-# timer_menu.add_option('Close Menu', PYGAME_MENU_CLOSE)
-
-# -----------------------------------------------------------------------------
-# Help menu
-help_menu = pygameMenu.TextMenu(surface,
-                                dopause=False,
-                                font=pygameMenu.fonts.FONT_FRANCHISE, 40,
-                                menu_color=(30, 50, 107),  # Background color
-                                menu_color_title=(120, 45, 30),
-                                onclose=PYGAME_MENU_DISABLE_CLOSE,  # Pressing ESC button does nothing
-                                title='Help',
-                                window_height=int(H_SIZE / 2),
-                                window_width=int(W_SIZE / 2)
-                                )
-help_menu.add_option('Return to Menu', PYGAME_MENU_BACK)
 for m in HELP:
-    help_menu.add_line(m)
+    print(m)
+    
+pygame.display.set_caption("Screencapture")
+screen = pygame.display.set_mode([630,540])
 
-# -----------------------------------------------------------------------------
-# About menu
-# about_menu = pygameMenu.TextMenu(surface,
-#                                  dopause=False,
-#                                  font=pygameMenu.fonts.FONT_NEVIS,
-#                                  font_size_title=30,
-#                                  font_title=pygameMenu.fonts.FONT_8BIT,
-#                                  menu_color_title=COLOR_BLUE,
-#                                  onclose=PYGAME_MENU_DISABLE_CLOSE,  # Disable menu close (ESC button)
-#                                  text_fontsize=20,
-#                                  title='About',
-#                                  window_height=H_SIZE / 2,
-#                                  window_width=W_SIZE / 2
-#                                  )
-# about_menu.add_option('Return to Menu', PYGAME_MENU_BACK)
-# for m in ABOUT:
-#     about_menu.add_line(m)
-# about_menu.add_line(PYGAMEMENU_TEXT_NEWLINE)
+#-----------------------------------------------
 
-# -----------------------------------------------------------------------------
-# Main menu, pauses execution of the application
-menu = pygameMenu.Menu(surface,
-                       bgfun=mainmenu_background,
-                       enabled=False,
-                       font=pygameMenu.fonts.FONT_NEVIS,
-                       font_size=40,
-                       menu_alpha=90,
-                       menu_color=MENU_BACKGROUND_COLOR,
-                       menu_height = int(H_SIZE * 0.6),
-                       menu_width = int(W_SIZE * 0.6,
-                       onclose=PYGAME_MENU_CLOSE,
-                       option_shadow=True,
-                       title='Main Menu',
-                       title_offsety=5,
-                       window_height=H_SIZE,
-                       window_width=W_SIZE
-                       )
-# menu.add_option(timer_menu.get_title(), timer_menu)  # Add timer submenu
-menu.add_option(help_menu.get_title(), help_menu)  # Add help submenu
-# menu.add_option(about_menu.get_title(), about_menu)  # Add about submenu
-menu.add_option('Exit', PYGAME_MENU_EXIT)  # Add exit function
+class Node:
+    def __init__(self,x_init,y_init):
+        self.x = x_init
+        self.y = y_init
+        self.is_selected = False
+        self.next_node = None
+    
+    def deselect(self):
+        self.is_selected = False
+    def select(self):
+        self.is_selected = True
+        
+    def get_pos(self):
+        return (self.x, self.y)
+    
+    def shift(self, x, y):
+        self.x += x
+        self.y += y
+    
+    def move_to(self, pos):
+        self.x = pos[0]
+        self.y = pos[1]
+    
+    def draw(self, screen):
+        if self.is_selected:
+            pygame.draw.circle(screen, (0, 255, 255), (self.x, self.y), 6, 0)
+        else:
+            pygame.draw.circle(screen, (0, 5, 255), (self.x, self.y), 4, 0)
+        if self.next_node != None:
+            pygame.draw.line(screen, (50, 5, 255), (self.x, self.y), self.next_node.get_pos(), 3)
+            
 
-# -----------------------------------------------------------------------------
-# Main loop
-while True:
+    def __repr__(self):
+        return "".join(["Node(", str(self.x), ",", str(self.y), ")"])
+
+def distance(p0, p1):
+        return math.sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2)
+
+def select_node(pos, screen):
+    selected = None
+    print(nodes)
+    for node in nodes:
+        node.deselect()
+        print(distance(pos, node.get_pos()))
+        if distance(pos, node.get_pos()) < select_radius:
+            #set selected to nearest node
+            selected = node
+            selected.select()
+            print("test")
+    return selected
+
+def text_objects(text, font, color):
+    textSurface = font.render(text, True, color)
+    return textSurface, textSurface.get_rect()
+
+def message_display(text):
+    largeText = pygame.font.Font('freesansbold.ttf',115)
+    TextSurf, TextRect = text_objects(text, largeText, BLACK)
+    TextRect.center = ((640/2),(505))
+    screen.blit(TextSurf, TextRect)
+
+def buttons(screen):
+#check events
+    #for event in pygame.event.get():
+        largeText = pygame.font.Font('freesansbold.ttf', 50)
+        TextSurf, TextRect = text_objects(modes[mode_index%len(modes)].upper(), largeText, BLACK)
+        TextRect.center = ((640/2),(506))
+        screen.blit(TextSurf, TextRect)
+        smallText = pygame.font.Font("freesansbold.ttf",20)
+
+        mouse = pygame.mouse.get_pos()
+        #pygame.draw.rect(screen, BLACK,(550,450,100,50))
+        if 0 < mouse[0] < 100 and 480+50 > mouse[1] > 480:
+            pygame.draw.rect(screen, L_PURPLE,(0,480,100,50))
+        else:
+            pygame.draw.rect(screen, PURPLE,(0,480,100,50))
 
 
-    # Paint background
-    surface.fill(COLOR_BACKGROUND)
+        if 540 < mouse[0] < 640 and 480+50 > mouse[1] > 480:
+            pygame.draw.rect(screen, L_PURPLE,(540,480,100,50))
+        else:
+            pygame.draw.rect(screen, PURPLE,(540,480,100,50))
 
-    # Application events
-    events = pygame.event.get()
+        
+        textSurf, textRect = text_objects("<", smallText, WHITE)
+        textRect.center = ( (0+(100/2)), (480+(50/2)) )
+        screen.blit(textSurf, textRect)
+        textSurf, textRect = text_objects(">", smallText, WHITE)
+        textRect.center = ( (540+(100/2)), (480+(50/2)) )
+        screen.blit(textSurf, textRect)
+
+
+def segment_screenshot():
+    import resize as re
+    #re.resize_square("crop.png", 530)
+    #re.resize_square("for_segmentation.png", 224)
+    sys.path.append("/usr/src/lego_classification/polyrnn-pp/src")
+    import polyrnn_module as pm
+    poly = pm.segment_image("for_segmentation.jpg")
+    l, w = 640, 640
+
+    for point in poly:
+        nodes.append(Node(int(point[0]*l), int((point[1]*w))))
+    nodes[-1].next_node=nodes[0]
+    for i in range(len(nodes)-1):
+        nodes[i].next_node = nodes[i+1]
+
+def init():
+    # Initialize game and create a screen object.
+#     pygame.init()
+#         background = pygame.image.load("crop.jpg")
+#         imagerect = background.get_rect()
+#         screen = pygame.display.set_mode((640, 530))
+    global modes
+    modes = ["create", "select", "order", "move"]
+    global mode_index
+    mode_index = 0 
+    select_radius = 60
+    n = 0
+    selected = []
+#     pygame.display.set_caption("Node Selection")
+
+    screen.fill(WHITE)
+
+def first_sequence(frame):
+    screen.fill([0,0,0])
+    rect = pygame.Rect(0,0,630,480)
+    sub = screen.subsurface(rect)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame = np.rot90(frame)
+    frame = pygame.surfarray.make_surface(frame)
+    screen.blit(frame, (0,0))
+    pygame.display.update()
+
+    events = pygame.event.get()    
     for event in events:
-        if event.type == QUIT:
-            exit()
-        elif event.type == KEYDOWN:
+        if event.type == KEYDOWN:
+            if event.key == K_SPACE:
+                pygame.image.save(sub, "crop.png")
+                second_sequence()
             if event.key == K_ESCAPE:
                 menu.enable()
 
-    # Draw timer
-#     time_string = str(datetime.timedelta(seconds=int(timer[0])))
-#     time_blit = timer_font.render(time_string, 1, COLOR_WHITE)
-#     time_blit_size = time_blit.get_size()
-#     surface.blit(time_blit, (
-#         W_SIZE / 2 - time_blit_size[0] / 2, H_SIZE / 2 - time_blit_size[1] / 2))
-
-    # Execute main from principal menu if is enabled
     menu.mainloop(events)
 
-    # Flip surface
     pygame.display.flip()
+            
+def second_sequence():
+    background = pygame.image.load("crop.jpg")
+    imagerect = background.get_rect()
+#     screen = pygame.display.set_mode((640, 530))
+    pygame.display.update()
+            
+#-----------------------------------------------
+
+help_menu = pygameMenu.TextMenu(screen,
+                                bgfun=mainmenu_background,
+                                dopause=True,
+                                font=pygameMenu.fonts.FONT_FRANCHISE,
+                                text_fontsize=25,
+                                font_size_title=60,
+                                menu_color=(0,0,0),  # Background color
+                                menu_color_title=(69, 61, 85),
+                                onclose=PYGAME_MENU_DISABLE_CLOSE,  # Pressing ESC button does nothing
+                                title='Help',
+                                menu_height=int(H_SIZE * .6),
+                                menu_width=int(W_SIZE * .9),
+                                window_height=int(H_SIZE - 55),
+                                window_width=int(W_SIZE + 27)
+                                )
+help_menu.add_option('Return to Menu', PYGAME_MENU_BACK)
+# for m in HELP:
+#     menu.add_line(m)
+
+#-----------------------------------------------
+
+menu = pygameMenu.TextMenu(screen,
+                       bgfun=mainmenu_background,
+                       enabled=False,
+                       font=pygameMenu.fonts.FONT_NEVIS,
+                       text_fontsize=17,
+                       menu_alpha=40,
+                       menu_color=(0,0,0),  # Background color
+                       menu_color_title=(69, 61, 85),
+                       onclose=PYGAME_MENU_CLOSE,
+                       title='Help',
+                       title_offsety=5,
+                       menu_height=int(H_SIZE * .6),
+                       menu_width=int(W_SIZE * .9),
+                       window_height=int(H_SIZE - 55),
+                       window_width=int(W_SIZE + 27)
+                       )
+for m in HELP:
+    menu.add_line(m)
+# menu.add_option(timer_menu.get_title(), timer_menu)  # Add timer submenu
+# menu.add_option(help_menu.get_title(), help_menu)  # Add help submenu
+# menu.add_option(about_menu.get_title(), about_menu)  # Add about submenu
+menu.add_option('Exit', PYGAME_MENU_EXIT)  # Add exit function
+
+#-----------------------------------------------
+
+try:
+    while True:
+        
+        ret, frame = cam.read()
+        
+            
+            
+        first_sequence(frame)
+        
+#             screen.fill([0,0,0])
+#             rect = pygame.Rect(0,0,630,480)
+#             sub = screen.subsurface(rect)
+#             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#             frame = np.rot90(frame)
+#             frame = pygame.surfarray.make_surface(frame)
+#             screen.blit(frame, (0,0))
+#             pygame.display.update()
+
+#             events = pygame.event.get()    
+#             for event in events:
+#                 if event.type == KEYDOWN:
+#                     if event.key == K_SPACE:
+#                         pygame.image.save(sub, "crop.png")
+                        
+                        
+#                     elif event.key == K_ESCAPE:
+#                         menu.enable()
+
+#             menu.mainloop(events)
+
+#             pygame.display.flip()
+            
+        second_sequence()
+            
+
+#-----------------------------------------------
+
+except KeyboardInterrupt:
+    pygame.quit()
+    cv2.destroyAllWindows()

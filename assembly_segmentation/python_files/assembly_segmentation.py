@@ -7,20 +7,6 @@ import numpy as np
 from Screenshotter import run, cropper
 #from resize import resize_square
 
-
-
-# try:
-#     # for Python2
-#     from Tkinter import *
-#     import tkFileDialog as filedialog
-#     import Tkconstants, tkFileDialog## notice capitalized T in Tkinter 
-    
-# except ImportError:
-#     # for Python3
-#     from tkinter import filedialog
-#     from tkinter import *
-    
-
 global nodes
 nodes = []
 
@@ -33,13 +19,27 @@ PURPLE = (69, 61, 85)
 L_PURPLE =(69,61, 150)
 BLACK = (0, 0, 0)
 global part
-parts = {0 : "Red 2x1", 1 : "Grey 4x1", 2 : "Black Tire", 3 : "Grey 8x2", 4 : "Grey 6x2", 
-        5 : "Yellow Corner", 6 : "Yellow Head", 7 : "Grey Handle", 8 : "Yellow Axle", 9 : "Blue Stud"}
+parts = {0 : "Red 2x1", 
+         1 : "Grey 4x1", 
+         2 : "Black Tire", 
+         3 : "Grey 8x2", 
+         4 : "Grey 6x2", 
+         5 : "Yellow Corner", 
+         6 : "Yellow Head", 
+         7 : "Grey Handle", 
+         8 : "Yellow Axle", 
+         9 : "Blue Stud"}
 global instructions
-instructions = {0 : "replace with newer design (part 3004)", 1 : "needs cleaning/maintanence", 
-        2 : "check tire pressure", 3 : "replace with two 3x2s", 4 : "replace with two 4x2s", 
-        5 : "reinforce with more brackets", 6 : "add hat", 7 : "replace with more visible color",
-        8 : "check allignment", 9 : "remove and reapply"}
+instructions = {0 : "replace with newer design (part 3004)", 
+                1 : "needs cleaning/maintanence", 
+                2 : "check tire pressure", 
+                3 : "replace with two 3x2s", 
+                4 : "replace with two 4x2s", 
+                5 : "reinforce with more brackets", 
+                6 : "add hat", 
+                7 : "replace with more visible color",
+                8 : "check allignment", 
+                9 : "remove and reapply"}
 
 
 
