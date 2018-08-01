@@ -17,7 +17,6 @@ def mainmenu_background():
     screen.fill((40, 0, 40))
 
 HELP = ['       ',
-        
         'Currently in Object Capture',
         '-----------------------------',
         'Press SPACEBAR to capture camera image',
@@ -33,7 +32,7 @@ HELP = ['       ',
 
 global nodes
 nodes = []
-
+first = []
 select_radius = 15
 objects = []
 BLUE = (12, 12, 200)
@@ -56,7 +55,7 @@ for m in HELP:
     print(m)
     
 pygame.display.set_caption("Screencapture")
-screen = pygame.display.set_mode([630,540])
+screen = pygame.display.set_mode([630,480])
 
 #-----------------------------------------------
 
@@ -123,7 +122,7 @@ def message_display(text):
 
 def buttons(screen):
 #check events
-    #for event in pygame.event.get():
+    for event in pygame.event.get():
         largeText = pygame.font.Font('freesansbold.ttf', 50)
         TextSurf, TextRect = text_objects(modes[mode_index%len(modes)].upper(), largeText, BLACK)
         TextRect.center = ((640/2),(506))
@@ -131,7 +130,7 @@ def buttons(screen):
         smallText = pygame.font.Font("freesansbold.ttf",20)
 
         mouse = pygame.mouse.get_pos()
-        #pygame.draw.rect(screen, BLACK,(550,450,100,50))
+        pygame.draw.rect(screen, BLACK,(550,450,100,50))
         if 0 < mouse[0] < 100 and 480+50 > mouse[1] > 480:
             pygame.draw.rect(screen, L_PURPLE,(0,480,100,50))
         else:
@@ -184,34 +183,60 @@ def init():
 
     screen.fill(WHITE)
 
-def first_sequence(frame):
-    screen.fill([0,0,0])
-    rect = pygame.Rect(0,0,630,480)
-    sub = screen.subsurface(rect)
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    frame = np.rot90(frame)
-    frame = pygame.surfarray.make_surface(frame)
-    screen.blit(frame, (0,0))
-    pygame.display.update()
+def first_sequence(frame, first):
+    
 
+    print("beginning")
+    print(len(first))
+
+    
+    
+    if len(first) < 1:
+        background = pygame.image.load("crop.png")
+        imagerect = background.get_rect()
+        screen = pygame.display.set_mode((640, 530))   # This line makes the stuttering 
+        buttons(screen)
+        pygame.draw.rect(screen, PURPLE,(0,480,100,50))
+#         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#         print("cv2.cvtCOlor")
+#         frame = np.rot90(frame)
+#         print("np.rot90")
+#         frame = pygame.surfarray.make_surface(frame)
+#         screen.blit(frame, (0,0))
+    pygame.display.update()
     events = pygame.event.get()    
     for event in events:
         if event.type == KEYDOWN:
             if event.key == K_SPACE:
                 pygame.image.save(sub, "crop.png")
+                #screen = pygame.display.set_mode([630,480])
                 second_sequence()
+                first.append(1)
+                print(len(first))
+                print("first see")
             if event.key == K_ESCAPE:
                 menu.enable()
-
+                print("menu")
+#     if first 0:
+#         print("were in here working")
+#         background = pygame.image.load("crop.jpg")
+#         imagerect = background.get_rect()
+# #         screen = pygame.display.set_mode((640, 530))
+#         pygame.draw.rect(screen, PURPLE,(0,480,100,50))
+        
     menu.mainloop(events)
 
     pygame.display.flip()
             
 def second_sequence():
-    background = pygame.image.load("crop.jpg")
+    print("second")
+    
+    background = pygame.image.load("crop.png")
     imagerect = background.get_rect()
-#     screen = pygame.display.set_mode((640, 530))
-    pygame.display.update()
+    screen = pygame.display.set_mode((640, 530))   # This line makes the stuttering 
+    buttons(screen)
+    pygame.draw.rect(screen, PURPLE,(0,480,100,50))
+#     pygame.display.update()
             
 #-----------------------------------------------
 
@@ -263,12 +288,14 @@ menu.add_option('Exit', PYGAME_MENU_EXIT)  # Add exit function
 
 try:
     while True:
-        
+        init()
         ret, frame = cam.read()
         
             
-            
-        first_sequence(frame)
+        screen.fill([0,0,0])
+        rect = pygame.Rect(0,0,630,480)
+        sub = screen.subsurface(rect)    
+        first_sequence(frame, first)
         
 #             screen.fill([0,0,0])
 #             rect = pygame.Rect(0,0,630,480)
@@ -293,7 +320,7 @@ try:
 
 #             pygame.display.flip()
             
-        second_sequence()
+#        second_sequence()
             
 
 #-----------------------------------------------
