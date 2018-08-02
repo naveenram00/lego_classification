@@ -6,6 +6,9 @@ import sys
 import os
 import pygameMenu
 from pygameMenu.locals import *
+import math
+from PIL import Image, ImageChops
+import numpy as np
 
 #-----------------------------------------------
 
@@ -16,19 +19,20 @@ def mainmenu_background():
     """
     screen.fill((40, 0, 40))
 
-HELP = ['       ',
-        'Currently in Object Capture',
-        '-----------------------------',
-        'Press SPACEBAR to capture camera image',
-        'Escape this window by EXIT in menu',
-        '       ',
-        
-#         'Press LEFT/RIGHT to change modes',
-#         '  Create: Click to create nodes',
-#         '  Select: Click to select node (Delete with BACKSPACE)',
-#         '  Order: Click on two existing nodes to connect them',
-#         '  Move: Click to move selected node to location'
-       ]
+HELP1 = [ '       ',
+          'Currently in Object Capture',
+          '+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+',
+          'Press SPACEBAR to capture camera image',
+          'Escape this window by EXIT in menu',
+          '       ' ]
+
+HELP2 = [ 'Currently in Node Selection',
+          '+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+',
+          'Press LEFT/RIGHT to change modes',
+          '  Create: CLICK to create nodes',
+          '  Select: Delete nodes with BACKSPACE',
+          '  Order: CLICK nodes to connect them',
+          '  Move: CLICK to move node location' ]
 
 global nodes
 nodes = []
@@ -44,18 +48,18 @@ BLACK = (0, 0, 0)
 H_SIZE = 600  # Height of window size
 W_SIZE = 600  # Width of window size
 
-#-----------------------------------------------
-
 cam = cv2.VideoCapture(0)
 
 pygame.init()
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
-for m in HELP:
+for m in HELP1:
+    print(m)
+for m in HELP2:
     print(m)
     
 pygame.display.set_caption("Screencapture")
-screen = pygame.display.set_mode([630,480])
+screen = pygame.display.set_mode([640,480])
 
 #-----------------------------------------------
 
@@ -94,9 +98,13 @@ class Node:
     def __repr__(self):
         return "".join(["Node(", str(self.x), ",", str(self.y), ")"])
 
+#-----------------------------------------------
+
 def distance(p0, p1):
         return math.sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2)
 
+#-----------------------------------------------
+    
 def select_node(pos, screen):
     selected = None
     print(nodes)
@@ -110,46 +118,45 @@ def select_node(pos, screen):
             print("test")
     return selected
 
+#-----------------------------------------------
+
 def text_objects(text, font, color):
     textSurface = font.render(text, True, color)
     return textSurface, textSurface.get_rect()
+
+#-----------------------------------------------
 
 def message_display(text):
     largeText = pygame.font.Font('freesansbold.ttf',115)
     TextSurf, TextRect = text_objects(text, largeText, BLACK)
     TextRect.center = ((640/2),(505))
     screen.blit(TextSurf, TextRect)
+    
+#-----------------------------------------------
 
 def buttons(screen):
-#check events
-    for event in pygame.event.get():
-        largeText = pygame.font.Font('freesansbold.ttf', 50)
-        TextSurf, TextRect = text_objects(modes[mode_index%len(modes)].upper(), largeText, BLACK)
-        TextRect.center = ((640/2),(506))
-        screen.blit(TextSurf, TextRect)
-        smallText = pygame.font.Font("freesansbold.ttf",20)
-
-        mouse = pygame.mouse.get_pos()
-        pygame.draw.rect(screen, BLACK,(550,450,100,50))
-        if 0 < mouse[0] < 100 and 480+50 > mouse[1] > 480:
-            pygame.draw.rect(screen, L_PURPLE,(0,480,100,50))
-        else:
-            pygame.draw.rect(screen, PURPLE,(0,480,100,50))
-
-
-        if 540 < mouse[0] < 640 and 480+50 > mouse[1] > 480:
-            pygame.draw.rect(screen, L_PURPLE,(540,480,100,50))
-        else:
-            pygame.draw.rect(screen, PURPLE,(540,480,100,50))
-
+    largeText = pygame.font.Font('freesansbold.ttf', 50)
+    TextSurf, TextRect = text_objects(modes[mode_index%len(modes)].upper(), largeText, BLACK)
+    TextRect.center = ((640/2),(506))
+    screen.blit(TextSurf, TextRect)
+    smallText = pygame.font.Font("freesansbold.ttf",20)
+    mouse = pygame.mouse.get_pos()
+    if 0 < mouse[0] < 100 and 480+50 > mouse[1] > 480:
+        pygame.draw.rect(screen, L_PURPLE,(0,480,100,50))
+    else:
+        pygame.draw.rect(screen, PURPLE,(0,480,100,50))
+    if 540 < mouse[0] < 640 and 480+50 > mouse[1] > 480:
+        pygame.draw.rect(screen, L_PURPLE,(540,480,100,50))
+    else:
+        pygame.draw.rect(screen, PURPLE,(540,480,100,50))    
+    textSurf, textRect = text_objects("<", smallText, WHITE)
+    textRect.center = ( (0+(100/2)), (480+(50/2)) )
+    screen.blit(textSurf, textRect)
+    textSurf, textRect = text_objects(">", smallText, WHITE)
+    textRect.center = ( (540+(100/2)), (480+(50/2)) )
+    screen.blit(textSurf, textRect)
         
-        textSurf, textRect = text_objects("<", smallText, WHITE)
-        textRect.center = ( (0+(100/2)), (480+(50/2)) )
-        screen.blit(textSurf, textRect)
-        textSurf, textRect = text_objects(">", smallText, WHITE)
-        textRect.center = ( (540+(100/2)), (480+(50/2)) )
-        screen.blit(textSurf, textRect)
-
+#-----------------------------------------------
 
 def segment_screenshot():
     import resize as re
@@ -166,102 +173,196 @@ def segment_screenshot():
     for i in range(len(nodes)-1):
         nodes[i].next_node = nodes[i+1]
 
-def init():
-    # Initialize game and create a screen object.
-#     pygame.init()
-#         background = pygame.image.load("crop.jpg")
-#         imagerect = background.get_rect()
-#         screen = pygame.display.set_mode((640, 530))
-    global modes
-    modes = ["create", "select", "order", "move"]
-    global mode_index
-    mode_index = 0 
-    select_radius = 60
-    n = 0
-    selected = []
-#     pygame.display.set_caption("Node Selection")
+#-----------------------------------------------
 
-    screen.fill(WHITE)
+def first_sequence(screen):
+    intro = True
+    while intro == True:
+        ret, frame = cam.read()
+        screen.fill(WHITE)
+        rect = pygame.Rect(0,0,640,480)
+        sub = screen.subsurface(rect) 
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        print("cv2.cvtCOlor")
+        frame = np.rot90(frame)
+        print("np.rot90")
+        frame = pygame.surfarray.make_surface(frame)
+        screen.blit(frame, (0,0))
+        pygame.display.update()
+        events = pygame.event.get()    
+        for event in events:
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    pygame.image.save(sub, "crop.jpg")
+                    intro = False
+                if event.key == K_ESCAPE:
+                    menu1.enable()
 
-def first_sequence(frame, first):
-    
-
-    print("beginning")
-    print(len(first))
-
-    
-    
-    if len(first) < 1:
-        background = pygame.image.load("crop.png")
-        imagerect = background.get_rect()
-        screen = pygame.display.set_mode((640, 530))   # This line makes the stuttering 
-        buttons(screen)
-        pygame.draw.rect(screen, PURPLE,(0,480,100,50))
-#         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-#         print("cv2.cvtCOlor")
-#         frame = np.rot90(frame)
-#         print("np.rot90")
-#         frame = pygame.surfarray.make_surface(frame)
-#         screen.blit(frame, (0,0))
-    pygame.display.update()
-    events = pygame.event.get()    
-    for event in events:
-        if event.type == KEYDOWN:
-            if event.key == K_SPACE:
-                pygame.image.save(sub, "crop.png")
-                #screen = pygame.display.set_mode([630,480])
-                second_sequence()
-                first.append(1)
-                print(len(first))
-                print("first see")
-            if event.key == K_ESCAPE:
-                menu.enable()
-                print("menu")
-#     if first 0:
-#         print("were in here working")
-#         background = pygame.image.load("crop.jpg")
-#         imagerect = background.get_rect()
-# #         screen = pygame.display.set_mode((640, 530))
-#         pygame.draw.rect(screen, PURPLE,(0,480,100,50))
         
-    menu.mainloop(events)
+        menu1.mainloop(events)
 
-    pygame.display.flip()
-            
-def second_sequence():
-    print("second")
-    
-    background = pygame.image.load("crop.png")
+        pygame.display.flip()
+        
+#-----------------------------------------------
+
+def second_sequence(screen, mode_index, nodes):
+    pygame.display.set_caption("Node Selection")
+    background = pygame.image.load("crop.jpg")
     imagerect = background.get_rect()
     screen = pygame.display.set_mode((640, 530))   # This line makes the stuttering 
-    buttons(screen)
-    pygame.draw.rect(screen, PURPLE,(0,480,100,50))
-#     pygame.display.update()
+    screen.fill(WHITE)
+    screen.blit(background, imagerect)
+    ending = True
+    while ending == True:
+        screen.fill(WHITE)
+        screen.blit(background, imagerect)
+        buttons(screen)
+        mode = modes[mode_index % len(modes)]
+        #set mouse type
+        if mode == "move":
+            pygame.mouse.set_cursor(*pygame.cursors.broken_x)
+        elif mode == "select":
+            pygame.mouse.set_cursor(*pygame.cursors.diamond)
+        elif mode == "order":
+            pygame.mouse.set_cursor(*pygame.cursors.arrow)
+        else:
+            pygame.mouse.set_cursor(*pygame.cursors.tri_left)
+        events = pygame.event.get()    
+        for event in events:
             
+            mouse = pygame.mouse.get_pos()
+            click = pygame.mouse.get_pressed()
+
+
+            if event.type == pygame.MOUSEBUTTONDOWN: #This checks for the mouse press event
+
+                
+                if mouse[1] > 480:
+                    
+                    if 0 < mouse[0] < 100:
+                        
+                        print("Mode: " + modes[mode_index % len(modes)])
+                        abs(mode_index = mode_index - 1)
+                    elif 540 < mouse[0] < 640 :    
+                        print("Mode: " + modes[mode_index % len(modes)])
+                        mode_index += 1
+
+                else:
+                    
+                    if mode == "create":
+
+                        nodes.append(Node(x_init=pygame.mouse.get_pos()[0], y_init=pygame.mouse.get_pos()[1])) #Gets the mouse position
+                        pygame.draw.circle(screen, BLUE, (nodes[n]), 4, 0) #Draws a circle at the mouse position!
+                        print(circ[n])
+                        n += 1
+
+
+                    if mode == "select":
+                        for node in nodes:
+                            print(node.is_selected)
+                        select_node(pygame.mouse.get_pos(), screen)
+
+                    if mode == "order":
+                        selected = 0
+                        for node in nodes:
+                            if node.is_selected:
+                                selected = node
+                        if selected == 0:
+                            select_node(pygame.mouse.get_pos(), screen)
+                        else:
+                            selected.next_node = select_node(pygame.mouse.get_pos(), screen)
+
+                    if mode == "move":
+
+                        node_selected = False
+
+                        for node in nodes:
+                            if node.is_selected:
+                                node_selected = True
+                        if not node_selected:
+                            select_node(pygame.mouse.get_pos(), screen)
+                        else:
+
+                            for node in nodes:
+                                if node.is_selected:
+
+                                    node.move_to(pygame.mouse.get_pos())
+                                    node.deselect()
+
+
+                if event.type == pygame.QUIT:
+                    ending = False
+                    sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    menu2.enable()
+                if event.key == pygame.K_RIGHT:
+                    mode_index += 1
+                    print("Mode: " + modes[mode_index % len(modes)])
+                elif event.key == pygame.K_LEFT:
+                    mode_index = abs(mode_index-1)
+                    print("Mode: " + modes[mode_index % len(modes)])
+                if event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
+                    for node in nodes:
+                        if node.is_selected:
+
+                            nn = node.next_node
+                            pn = None
+
+                            for node2 in nodes:
+                                if node2.next_node == node:
+                                    pn = node2
+                            if (nn == None and pn == None):
+                                nodes.remove(node)
+                            elif ((not nn == None) and pn == None):
+                                node.next_node = None
+                                nodes.remove(node)
+                                nn.is_selected = True
+                            elif ((not pn == None) and nn == None):
+                                pn.next_node = None
+                                nodes.remove(node)
+                            else:
+                                pn.next_node = nn
+                                nodes.remove(node)
+                                nn.is_selected = True
+
+                if event.key == pygame.K_RETURN:
+                    print(nodes)
+#                     for node in nodes:
+#                         if node.next_node == None:
+#                             nodes.remove(node)
+#                     print(nodes)
+
+                    nodes_copy = [x for x in nodes if not x.next_node == None]
+
+                    print(nodes_copy) 
+                    for node in nodes_copy:
+                        print(node.next_node)
+
+                    ordered_nodes = [nodes_copy[0].get_pos()]
+                    #nodes_copy = nodes
+                    node = nodes_copy[0]
+                    while len(nodes_copy) > 0:
+                        ordered_nodes.append(node.next_node.get_pos())
+                        nodes_copy.remove(node)
+                        node = node.next_node
+                    del nodes[:]
+                    nodes.extend(nodes_copy)
+
+
+#                     print(ordered_nodes)
+
+                    cropper(ordered_nodes)
+                    background = pygame.image.load("out.png")    
+            
+        pygame.display.update()
+        menu2.mainloop(events)
+    
 #-----------------------------------------------
 
-help_menu = pygameMenu.TextMenu(screen,
-                                bgfun=mainmenu_background,
-                                dopause=True,
-                                font=pygameMenu.fonts.FONT_FRANCHISE,
-                                text_fontsize=25,
-                                font_size_title=60,
-                                menu_color=(0,0,0),  # Background color
-                                menu_color_title=(69, 61, 85),
-                                onclose=PYGAME_MENU_DISABLE_CLOSE,  # Pressing ESC button does nothing
-                                title='Help',
-                                menu_height=int(H_SIZE * .6),
-                                menu_width=int(W_SIZE * .9),
-                                window_height=int(H_SIZE - 55),
-                                window_width=int(W_SIZE + 27)
-                                )
-help_menu.add_option('Return to Menu', PYGAME_MENU_BACK)
-# for m in HELP:
-#     menu.add_line(m)
-
-#-----------------------------------------------
-
-menu = pygameMenu.TextMenu(screen,
+menu1 = pygameMenu.TextMenu(screen,
                        bgfun=mainmenu_background,
                        enabled=False,
                        font=pygameMenu.fonts.FONT_NEVIS,
@@ -274,57 +375,64 @@ menu = pygameMenu.TextMenu(screen,
                        title_offsety=5,
                        menu_height=int(H_SIZE * .6),
                        menu_width=int(W_SIZE * .9),
-                       window_height=int(H_SIZE - 55),
-                       window_width=int(W_SIZE + 27)
+                       window_height=int(H_SIZE - 110), # Higher number moves menu up
+                       window_width=int(W_SIZE + 43) # Higher number moves menu right
                        )
-for m in HELP:
-    menu.add_line(m)
-# menu.add_option(timer_menu.get_title(), timer_menu)  # Add timer submenu
-# menu.add_option(help_menu.get_title(), help_menu)  # Add help submenu
-# menu.add_option(about_menu.get_title(), about_menu)  # Add about submenu
-menu.add_option('Exit', PYGAME_MENU_EXIT)  # Add exit function
+
+menu2 = pygameMenu.TextMenu(screen,
+                       bgfun=mainmenu_background,
+                       enabled=False,
+                       font=pygameMenu.fonts.FONT_NEVIS,
+                       text_fontsize=17,
+                       menu_alpha=40,
+                       menu_color=(0,0,0),  # Background color
+                       menu_color_title=(69, 61, 85),
+                       onclose=PYGAME_MENU_CLOSE,
+                       title='Help',
+                       title_offsety=5,
+                       menu_height=int(H_SIZE * .6),
+                       menu_width=int(W_SIZE * .9),
+                       window_height=int(H_SIZE - 55), 
+                       window_width=int(W_SIZE + 43)
+                       )
 
 #-----------------------------------------------
 
-try:
-    while True:
-        init()
-        ret, frame = cam.read()
-        
-            
-        screen.fill([0,0,0])
-        rect = pygame.Rect(0,0,630,480)
-        sub = screen.subsurface(rect)    
-        first_sequence(frame, first)
-        
-#             screen.fill([0,0,0])
-#             rect = pygame.Rect(0,0,630,480)
-#             sub = screen.subsurface(rect)
-#             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-#             frame = np.rot90(frame)
-#             frame = pygame.surfarray.make_surface(frame)
-#             screen.blit(frame, (0,0))
-#             pygame.display.update()
+for m in HELP1:
+    menu1.add_line(m)
+for m in HELP2:
+    menu2.add_line(m)
 
-#             events = pygame.event.get()    
-#             for event in events:
-#                 if event.type == KEYDOWN:
-#                     if event.key == K_SPACE:
-#                         pygame.image.save(sub, "crop.png")
-                        
-                        
-#                     elif event.key == K_ESCAPE:
-#                         menu.enable()
-
-#             menu.mainloop(events)
-
-#             pygame.display.flip()
-            
-#        second_sequence()
-            
+menu1.add_option('Exit', PYGAME_MENU_EXIT)  # Add exit function
+menu2.add_option('Exit', PYGAME_MENU_EXIT)
 
 #-----------------------------------------------
 
-except KeyboardInterrupt:
-    pygame.quit()
-    cv2.destroyAllWindows()
+def init1():
+    global modes
+    modes = ["create", "select", "order", "move"]
+    global mode_index
+    mode_index = 0 
+    select_radius = 60
+    n = 0
+    selected = []
+
+#----------------------------------------------- 
+
+def init2():
+    background = pygame.image.load("crop.jpg")
+    imagerect = background.get_rect()
+    screen = pygame.display.set_mode((640, 530))   # This line makes the stuttering 
+    screen.fill(WHITE)
+    screen.blit(background, imagerect)
+
+#-----------------------------------------------
+init1()            
+first_sequence(screen)
+#init2()
+second_sequence(screen, mode_index, nodes)
+#-----------------------------------------------
+
+# except KeyboardInterrupt:
+#     pygame.quit()
+#     cv2.destroyAllWindows()

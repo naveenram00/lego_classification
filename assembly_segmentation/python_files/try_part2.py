@@ -65,27 +65,21 @@ def text_objects(text, font, color):
 
 def buttons(screen):
 #check events
-    for event in pygame.event.get():
+#     for event in pygame.event.get():
         largeText = pygame.font.Font('freesansbold.ttf', 50)
         TextSurf, TextRect = text_objects(modes[mode_index%len(modes)].upper(), largeText, BLACK)
         TextRect.center = ((640/2),(506))
         screen.blit(TextSurf, TextRect)
         smallText = pygame.font.Font("freesansbold.ttf",20)
-
         mouse = pygame.mouse.get_pos()
-#         pygame.draw.rect(screen, BLACK,(550,450,100,50))
         if 0 < mouse[0] < 100 and 480+50 > mouse[1] > 480:
             pygame.draw.rect(screen, L_PURPLE,(0,480,100,50))
         else:
             pygame.draw.rect(screen, PURPLE,(0,480,100,50))
-
-
         if 540 < mouse[0] < 640 and 480+50 > mouse[1] > 480:
             pygame.draw.rect(screen, L_PURPLE,(540,480,100,50))
         else:
-            pygame.draw.rect(screen, PURPLE,(540,480,100,50))
-
-        
+            pygame.draw.rect(screen, PURPLE,(540,480,100,50))    
         textSurf, textRect = text_objects("<", smallText, WHITE)
         textRect.center = ( (0+(100/2)), (480+(50/2)) )
         screen.blit(textSurf, textRect)
@@ -147,15 +141,50 @@ def init():
     screen = pygame.display.set_mode((640, 530))   # This line makes the stuttering 
     screen.fill(WHITE)
     screen.blit(background, imagerect)
+    #-------------------
+    global modes
+    modes = ["create", "select", "order", "move"]
+    global mode_index
+    mode_index = 0 
+    
+    #-------------------
     
     while True:
         screen.fill(WHITE)
         screen.blit(background, imagerect)
-        for event in pygame.event.get():
+        buttons(screen)
+#-----------BUTTONS------------------
+#         largeText = pygame.font.Font('freesansbold.ttf', 50)
+#         TextSurf, TextRect = text_objects(modes[mode_index%len(modes)].upper(), largeText, BLACK)
+#         TextRect.center = ((640/2),(506))
+#         screen.blit(TextSurf, TextRect)
+#         smallText = pygame.font.Font("freesansbold.ttf",20)
+#         mouse = pygame.mouse.get_pos()
+#         if 0 < mouse[0] < 100 and 480+50 > mouse[1] > 480:
+#             pygame.draw.rect(screen, L_PURPLE,(0,480,100,50))
+#         else:
+#             pygame.draw.rect(screen, PURPLE,(0,480,100,50))
+#         if 540 < mouse[0] < 640 and 480+50 > mouse[1] > 480:
+#             pygame.draw.rect(screen, L_PURPLE,(540,480,100,50))
+#         else:
+#             pygame.draw.rect(screen, PURPLE,(540,480,100,50))    
+#         textSurf, textRect = text_objects("<", smallText, WHITE)
+#         textRect.center = ( (0+(100/2)), (480+(50/2)) )
+#         screen.blit(textSurf, textRect)
+#         textSurf, textRect = text_objects(">", smallText, WHITE)
+#         textRect.center = ( (540+(100/2)), (480+(50/2)) )
+#         screen.blit(textSurf, textRect)
+    
+#-----------BUTTONS-------------------
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    menu.enable()
             
         pygame.display.update()
-        
+        menu.mainloop(events)
     
 init()
