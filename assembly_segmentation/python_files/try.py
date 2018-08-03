@@ -36,7 +36,6 @@ HELP2 = [ 'Currently in Node Selection',
 
 global nodes
 nodes = []
-first = []
 select_radius = 15
 objects = []
 BLUE = (12, 12, 200)
@@ -134,11 +133,8 @@ def message_display(text):
     
 #-----------------------------------------------
 
-def buttons(screen):
+def buttons(screen, mode):
     largeText = pygame.font.Font('freesansbold.ttf', 50)
-    TextSurf, TextRect = text_objects(modes[mode_index%len(modes)].upper(), largeText, BLACK)
-    TextRect.center = ((640/2),(506))
-    screen.blit(TextSurf, TextRect)
     smallText = pygame.font.Font("freesansbold.ttf",20)
     mouse = pygame.mouse.get_pos()
     if 0 < mouse[0] < 100 and 480+50 > mouse[1] > 480:
@@ -148,11 +144,16 @@ def buttons(screen):
     if 540 < mouse[0] < 640 and 480+50 > mouse[1] > 480:
         pygame.draw.rect(screen, L_PURPLE,(540,480,100,50))
     else:
-        pygame.draw.rect(screen, PURPLE,(540,480,100,50))    
+        pygame.draw.rect(screen, PURPLE,(540,480,100,50)) 
+       
+    TextSurf, TextRect = text_objects(modes[mode_index%len(modes)].upper(), largeText, BLACK)
+    
+    TextRect.center = ((640/2),(506))
+    screen.blit(TextSurf, TextRect)    
     textSurf, textRect = text_objects("<", smallText, WHITE)
     textRect.center = ( (0+(100/2)), (480+(50/2)) )
     screen.blit(textSurf, textRect)
-    textSurf, textRect = text_objects(">", smallText, WHITE)
+    textSurf, textRect = text_objects(str(mode_index), smallText, WHITE)
     textRect.center = ( (540+(100/2)), (480+(50/2)) )
     screen.blit(textSurf, textRect)
         
@@ -214,11 +215,35 @@ def second_sequence(screen, mode_index, nodes):
     screen = pygame.display.set_mode((640, 530))   # This line makes the stuttering 
     screen.fill(WHITE)
     screen.blit(background, imagerect)
+    n = 0
+    select_radius = 60
+    selected = []
     ending = True
     while ending == True:
         screen.fill(WHITE)
         screen.blit(background, imagerect)
-        buttons(screen)
+        largeText = pygame.font.Font('freesansbold.ttf', 50)
+        smallText = pygame.font.Font("freesansbold.ttf",20)
+        mouse = pygame.mouse.get_pos()
+        if 0 < mouse[0] < 100 and 480+50 > mouse[1] > 480:
+            pygame.draw.rect(screen, L_PURPLE,(0,480,100,50))
+        else:
+            pygame.draw.rect(screen, PURPLE,(0,480,100,50))
+        if 540 < mouse[0] < 640 and 480+50 > mouse[1] > 480:
+            pygame.draw.rect(screen, L_PURPLE,(540,480,100,50))
+        else:
+            pygame.draw.rect(screen, PURPLE,(540,480,100,50)) 
+
+        TextSurf, TextRect = text_objects(modes[mode_index%len(modes)].upper(), largeText, BLACK)
+
+        TextRect.center = ((640/2),(506))
+        screen.blit(TextSurf, TextRect)    
+        textSurf, textRect = text_objects("<", smallText, WHITE)
+        textRect.center = ( (0+(100/2)), (480+(50/2)) )
+        screen.blit(textSurf, textRect)
+        textSurf, textRect = text_objects(">", smallText, WHITE)
+        textRect.center = ( (540+(100/2)), (480+(50/2)) )
+        screen.blit(textSurf, textRect)
         mode = modes[mode_index % len(modes)]
         #set mouse type
         if mode == "move":
@@ -244,7 +269,8 @@ def second_sequence(screen, mode_index, nodes):
                     if 0 < mouse[0] < 100:
                         
                         print("Mode: " + modes[mode_index % len(modes)])
-                        abs(mode_index = mode_index - 1)
+                        mode_index = abs(mode_index - 1)
+                        print(mode_index)
                     elif 540 < mouse[0] < 640 :    
                         print("Mode: " + modes[mode_index % len(modes)])
                         mode_index += 1
@@ -254,8 +280,9 @@ def second_sequence(screen, mode_index, nodes):
                     if mode == "create":
 
                         nodes.append(Node(x_init=pygame.mouse.get_pos()[0], y_init=pygame.mouse.get_pos()[1])) #Gets the mouse position
+                        print(nodes[n])
                         pygame.draw.circle(screen, BLUE, (nodes[n]), 4, 0) #Draws a circle at the mouse position!
-                        print(circ[n])
+                        
                         n += 1
 
 
@@ -412,7 +439,7 @@ def init1():
     global modes
     modes = ["create", "select", "order", "move"]
     global mode_index
-    mode_index = 0 
+    mode_index = 100000 
     select_radius = 60
     n = 0
     selected = []
