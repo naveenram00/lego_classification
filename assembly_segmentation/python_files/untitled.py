@@ -19,7 +19,7 @@ import datetime
 import os
 import pygame
 from pygame.locals import *
-
+from Screenshotter import run, cropper
 # Import pygameMenu
 import pygameMenu
 from pygameMenu.locals import *
